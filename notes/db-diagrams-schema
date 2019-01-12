@@ -1,0 +1,255 @@
+Table adminroles {
+  id integer PK
+  name varchar
+  description varchar
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table useradmin {
+  id integer PK
+  email varchar
+  password varchar
+  admin_role_id integer
+  date_created timestamp
+  date_modified timestamp
+}
+Ref useradmin_admin_role_id {
+  useradmin.admin_role_id > adminroles.id
+}
+
+Table userheader {
+  id integer PK
+  email varchar
+  password varchar
+  publickey varchar
+  is_private boolean
+  is_premium boolean
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table userconnections {
+  id integer PK
+  user_id integer
+  follower_id integer
+  awaiting_response boolean
+  is_active boolean
+  is_blocked boolean
+  date_created timestamp
+  date_modified timestamp
+}
+Ref userconnections_user_id {
+  userconnections.user_id > userheader.id 
+}
+Ref userconnections_follower_id {
+  userconnections.follower_id > userheader.id 
+}
+
+Table scoringsystemheader {
+  id integer PK
+  is_custom integer
+  created_by integer
+  last_modified_by integer
+  date_created timestamp
+  date_modified timestamp
+}
+Ref scoringsystemheader_created_by {
+  scoringsystemheader.created_by > userheader.id
+}
+Ref scoringsystemheader_last_modified_by {
+  scoringsystemheader.last_modified_by > userheader.id
+}
+
+Table scoringdetails {
+  id integer PK
+  name varchar
+  description varchar
+  type varchar
+  is_default boolean
+  created_by integer
+  points smallint
+  last_modified_by integer
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table contestheader {
+  id integer PK
+  contest_name varchar
+  is_active boolean
+  is_default boolean
+  created_by integer
+  current_owner integer
+  is_public boolean
+  is_private boolean
+  invitation_code varchar
+  start_date timestamp
+  end_date timestamp
+  current_event smallint
+  total_events smallint
+  is_premium boolean
+  player_limit integer
+  last_modified_by integer
+  date_created timestamp
+  date_modified timestamp
+}
+Ref contestheader_created_by {
+  contestheader.created_by > userheader.id 
+}
+Ref contestheader_current_owner {
+  contestheader.current_owner > userheader.id 
+}
+Ref contestheader_last_modified_by {
+  contestheader.last_modified_by > userheader.id 
+}
+
+Table contestscoring {
+  id integer PK
+  contest_header_id integer
+  scoring_system_header_id integer
+  is_active boolean
+  contest_slate_start integer
+  contest_slate_end integer
+}
+
+Table invitestatus {
+  id integer PK
+  name varchar
+}
+
+Table participanttype {
+  id integer PK
+  participant_type_name varchar
+  participant_description varchar
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table contestuser {
+  id integer PK
+  contest_header_id integer
+  user_id integer
+  is_invited boolean
+  invite_status_id smallint 
+  is_active boolean
+  is_blocked boolean
+  balance float
+  created_by integer
+  invited_by integer
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table team {
+  id integer PK
+  code integer
+  fantasy_id integer
+  name varchar
+  short_name varchar(3)
+  strength smallint
+  strength_attack_away integer
+  strength_attack_home integer
+  strength_defence_away integer
+  strength_defence_home integer
+  strength_overall_away integer
+  strength_overall_home integer
+  team_division integer
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table fixtureheader {
+  id integer PK
+  fantasy_id integer
+  code integer
+  deadline_time timestamp
+  deadline_time_formatted varchar
+  event smallint
+  event_day smallint
+  finished boolean
+  finished_provisional boolean
+  kickoff_time timestamp
+  kickoff_time_formatted varchar
+  minutes smallint
+  provisional_start_time boolean
+  started boolean
+  team_a integer
+  team_a_score smallint
+  teah_h integer
+  team_h_score smallint
+  result varchar(2)
+  last_modified_by integer
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table defaultslateheader {
+  id integer PK
+  source varchar
+  type varchar
+  event_id integer
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table defaultslateentries {
+  id integer PK
+  default_slate_header_id integer
+  fixture_id integer
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table contestslateheader {
+  id integer PK
+  contest_header_id integer
+  event_id integer
+  is_active boolean
+  start_date timestamp
+  end_date timestamp
+  has_started boolean
+  has_finished boolean
+  total_possible_entries integer
+  total_entries integer
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table contestslateentry {
+  id integer PK
+  contest_slate_header_id integer
+  fixture_id integer
+  date_created timestamp
+  date_modified timestamp
+}
+
+// This table contains all user predictions
+// For this contest
+Table contestresult {
+  id integer PK
+  contest_slate_entry_id integer
+  contest_user_id
+  home_score integer
+  away_score integer
+  expected_result varchar(2)
+  scores_matches boolean
+  result_matches boolean
+  is_banker boolean
+  has_started boolean
+  has_finished boolean
+  points_scored smallint
+  deadline timestamp
+  date_created timestamp
+  date_modified timestamp
+}
+
+// This table contains player points totals for each week
+Table contestpoints {
+  id integer PK
+  contest_slate_header_id integer
+  contest_user_id integer
+  total_points integer
+  date_created timestamp
+  date_modified timestamp
+}

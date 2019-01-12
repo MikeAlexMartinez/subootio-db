@@ -1,0 +1,14 @@
+Process:-
+1. Create predefined tables
+  - admin roles
+  - user admin
+  - participant type
+  - complete default scoring system, header and details
+2. Create all tables
+  - Add teams to teams table
+  - add fixtures to fixtures header
+  - Define default slates from fantasy gameweeks
+3. Create default scoring system
+  - Correct result - 1 Point
+  - Correct Score - 2 Points (In addition to result)
+
