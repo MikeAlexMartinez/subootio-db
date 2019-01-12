@@ -10,6 +10,18 @@ Table useradmin {
   id integer PK
   email varchar
   password varchar
+  admin_role_id integerTable adminroles {
+  id integer PK
+  name varchar
+  description varchar
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table useradmin {
+  id integer PK
+  email varchar
+  password varchar
   admin_role_id integer
   date_created timestamp
   date_modified timestamp
@@ -74,7 +86,7 @@ Table scoringdetails {
   date_modified timestamp
 }
 
-Table contestheader {
+Table contest_header {
   id integer PK
   contest_name varchar
   is_active boolean
@@ -94,14 +106,14 @@ Table contestheader {
   date_created timestamp
   date_modified timestamp
 }
-Ref contestheader_created_by {
-  contestheader.created_by > userheader.id 
+Ref contest_header_created_by {
+  contest_header.created_by > userheader.id 
 }
-Ref contestheader_current_owner {
-  contestheader.current_owner > userheader.id 
+Ref contest_header_current_owner {
+  contest_header.current_owner > userheader.id 
 }
-Ref contestheader_last_modified_by {
-  contestheader.last_modified_by > userheader.id 
+Ref contest_header_last_modified_by {
+  contest_header.last_modified_by > userheader.id 
 }
 
 Table contestscoring {
@@ -113,12 +125,34 @@ Table contestscoring {
   contest_slate_end integer
 }
 
-Table invitestatus {
+Table userinvite {
   id integer PK
-  name varchar
+  invite_code varchar
+  email varchar
+  invite_creator integer
+  accepted boolean
+  date_created timestamp
+  date_modified timestamp
+}
+Ref userinvite_invite_creator {
+  userinvite.invite_creator > userheader.id
 }
 
-Table participanttype {
+Table successful_invite_user {
+  id integer PK
+  userinvite_id integer
+  new_user_id integer
+  date_created timestamp
+  date_modified timestamp
+}
+Ref successful_invite_user_new_user_id {
+  successful_invite_user.new_user_id - userheader.id
+}
+Ref successful_invite_user_userinvite_id {
+  successful_invite_user.userinvite_id - userinvite.id
+}
+
+Table participant_type {
   id integer PK
   participant_type_name varchar
   participant_description varchar
@@ -126,9 +160,10 @@ Table participanttype {
   date_modified timestamp
 }
 
-Table contestuser {
+Table contest_user {
   id integer PK
   contest_header_id integer
+  participant_type_id integer
   user_id integer
   is_invited boolean
   invite_status_id smallint 
@@ -142,8 +177,8 @@ Table contestuser {
 }
 
 Table team {
-  id integer PK
-  code integer
+  code integer PK
+  fpl_team_id integer
   fantasy_id integer
   name varchar
   short_name varchar(3)
@@ -159,8 +194,22 @@ Table team {
   date_modified timestamp
 }
 
-Table fixtureheader {
+Table seasons {
   id integer PK
+  competition varchar
+  start_year integer
+  end_year integer
+  is_current boolean
+  is_previous boolean
+  is_next boolean
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table fixture_header {
+  id integer PK
+  fpl_fixture_id integer
+  season_id integer
   fantasy_id integer
   code integer
   deadline_time timestamp
@@ -184,7 +233,29 @@ Table fixtureheader {
   date_modified timestamp
 }
 
-Table defaultslateheader {
+Table events {
+  id integer PK
+  fpl_event_id integer
+  season_id integer
+  average_entry_score integer 
+  data_checked boolean
+  deadline_time timestamp
+  deadline_time_epoch integer
+  deadline_time_formatted varchar
+  deadline_time_game_offset integer
+  finished boolean
+  highest_score integer
+  highest_scoring_entry integer
+  is_current boolean
+  is_next boolean
+  is_previous boolean
+  name varchar
+}
+Ref events_season_id {
+  events.season_id > seasons.id
+}
+
+Table default_slate_header {
   id integer PK
   source varchar
   type varchar
@@ -193,7 +264,7 @@ Table defaultslateheader {
   date_modified timestamp
 }
 
-Table defaultslateentries {
+Table default_slate_entries {
   id integer PK
   default_slate_header_id integer
   fixture_id integer
@@ -201,7 +272,7 @@ Table defaultslateentries {
   date_modified timestamp
 }
 
-Table contestslateheader {
+Table contest_slate_header {
   id integer PK
   contest_header_id integer
   event_id integer
@@ -216,7 +287,7 @@ Table contestslateheader {
   date_modified timestamp
 }
 
-Table contestslateentry {
+Table contest_slate_entry {
   id integer PK
   contest_slate_header_id integer
   fixture_id integer
@@ -226,10 +297,10 @@ Table contestslateentry {
 
 // This table contains all user predictions
 // For this contest
-Table contestresult {
+Table contest_result {
   id integer PK
   contest_slate_entry_id integer
-  contest_user_id
+  contest_user_id integer
   home_score integer
   away_score integer
   expected_result varchar(2)
@@ -245,7 +316,7 @@ Table contestresult {
 }
 
 // This table contains player points totals for each week
-Table contestpoints {
+Table contest_points {
   id integer PK
   contest_slate_header_id integer
   contest_user_id integer
