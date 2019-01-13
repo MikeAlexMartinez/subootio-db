@@ -1,4 +1,4 @@
-Table adminroles {
+Table admin_roles {
   id integer PK
   name varchar
   description varchar
@@ -6,19 +6,7 @@ Table adminroles {
   date_modified timestamp
 }
 
-Table useradmin {
-  id integer PK
-  email varchar
-  password varchar
-  admin_role_id integerTable adminroles {
-  id integer PK
-  name varchar
-  description varchar
-  date_created timestamp
-  date_modified timestamp
-}
-
-Table useradmin {
+Table user_admin {
   id integer PK
   email varchar
   password varchar
@@ -26,11 +14,11 @@ Table useradmin {
   date_created timestamp
   date_modified timestamp
 }
-Ref useradmin_admin_role_id {
-  useradmin.admin_role_id > adminroles.id
+Ref user_admin_admin_role_id {
+  user_admin.admin_role_id > admin_roles.id
 }
 
-Table userheader {
+Table user_header {
   id integer PK
   email varchar
   password varchar
@@ -41,7 +29,7 @@ Table userheader {
   date_modified timestamp
 }
 
-Table userconnections {
+Table user_connections {
   id integer PK
   user_id integer
   follower_id integer
@@ -51,14 +39,14 @@ Table userconnections {
   date_created timestamp
   date_modified timestamp
 }
-Ref userconnections_user_id {
-  userconnections.user_id > userheader.id 
+Ref user_connections_user_id {
+  user_connections.user_id > user_header.id 
 }
-Ref userconnections_follower_id {
-  userconnections.follower_id > userheader.id 
+Ref user_connections_follower_id {
+  user_connections.follower_id > user_header.id 
 }
 
-Table scoringsystemheader {
+Table scoring_system_header {
   id integer PK
   is_custom integer
   created_by integer
@@ -66,14 +54,14 @@ Table scoringsystemheader {
   date_created timestamp
   date_modified timestamp
 }
-Ref scoringsystemheader_created_by {
-  scoringsystemheader.created_by > userheader.id
+Ref scoring_system_header_created_by {
+  scoring_system_header.created_by > user_header.id
 }
-Ref scoringsystemheader_last_modified_by {
-  scoringsystemheader.last_modified_by > userheader.id
+Ref scoring_system_header_last_modified_by {
+  scoring_system_header.last_modified_by > user_header.id
 }
 
-Table scoringdetails {
+Table scoring_details {
   id integer PK
   name varchar
   description varchar
@@ -107,16 +95,16 @@ Table contest_header {
   date_modified timestamp
 }
 Ref contest_header_created_by {
-  contest_header.created_by > userheader.id 
+  contest_header.created_by > user_header.id 
 }
 Ref contest_header_current_owner {
-  contest_header.current_owner > userheader.id 
+  contest_header.current_owner > user_header.id 
 }
 Ref contest_header_last_modified_by {
-  contest_header.last_modified_by > userheader.id 
+  contest_header.last_modified_by > user_header.id 
 }
 
-Table contestscoring {
+Table contest_scoring {
   id integer PK
   contest_header_id integer
   scoring_system_header_id integer
@@ -125,7 +113,7 @@ Table contestscoring {
   contest_slate_end integer
 }
 
-Table userinvite {
+Table user_invite {
   id integer PK
   invite_code varchar
   email varchar
@@ -134,8 +122,8 @@ Table userinvite {
   date_created timestamp
   date_modified timestamp
 }
-Ref userinvite_invite_creator {
-  userinvite.invite_creator > userheader.id
+Ref user_invite_invite_creator {
+  user_invite.invite_creator > user_header.id
 }
 
 Table successful_invite_user {
@@ -146,10 +134,10 @@ Table successful_invite_user {
   date_modified timestamp
 }
 Ref successful_invite_user_new_user_id {
-  successful_invite_user.new_user_id - userheader.id
+  successful_invite_user.new_user_id - user_header.id
 }
 Ref successful_invite_user_userinvite_id {
-  successful_invite_user.userinvite_id - userinvite.id
+  successful_invite_user.userinvite_id - user_invite.id
 }
 
 Table participant_type {
@@ -175,6 +163,21 @@ Table contest_user {
   date_created timestamp
   date_modified timestamp
 }
+Ref contest_user_contest_header_id {
+  contest_user.contest_header_id > contest_header.id
+}
+Ref contest_user_participant_type {
+  contest_user.participant_type_id > participant_type.id
+}
+Ref contest_user_user_id {
+  contest_user.user_id > user_header.id
+}
+Ref contest_user_created_by {
+  contest_user.created_by > user_header.id
+}
+Ref contest_user_invited_by {
+  contest_user.invited_by > user_header.id
+}
 
 Table team {
   code integer PK
@@ -194,7 +197,7 @@ Table team {
   date_modified timestamp
 }
 
-Table seasons {
+Table season {
   id integer PK
   competition varchar
   start_year integer
@@ -206,34 +209,7 @@ Table seasons {
   date_modified timestamp
 }
 
-Table fixture_header {
-  id integer PK
-  fpl_fixture_id integer
-  season_id integer
-  fantasy_id integer
-  code integer
-  deadline_time timestamp
-  deadline_time_formatted varchar
-  event smallint
-  event_day smallint
-  finished boolean
-  finished_provisional boolean
-  kickoff_time timestamp
-  kickoff_time_formatted varchar
-  minutes smallint
-  provisional_start_time boolean
-  started boolean
-  team_a integer
-  team_a_score smallint
-  teah_h integer
-  team_h_score smallint
-  result varchar(2)
-  last_modified_by integer
-  date_created timestamp
-  date_modified timestamp
-}
-
-Table events {
+Table event {
   id integer PK
   fpl_event_id integer
   season_id integer
@@ -251,8 +227,47 @@ Table events {
   is_previous boolean
   name varchar
 }
-Ref events_season_id {
-  events.season_id > seasons.id
+Ref event_season_id {
+  event.season_id > season.id
+}
+
+Table fixture_header {
+  id integer PK
+  fpl_fixture_id integer
+  season_id integer
+  fantasy_id integer
+  code integer
+  deadline_time timestamp
+  deadline_time_formatted varchar
+  event integer
+  event_day smallint
+  finished boolean
+  finished_provisional boolean
+  kickoff_time timestamp
+  kickoff_time_formatted varchar
+  minutes smallint
+  provisional_start_time boolean
+  started boolean
+  team_a integer
+  team_a_score smallint
+  team_h integer
+  team_h_score smallint
+  result varchar(2)
+  last_modified_by integer
+  date_created timestamp
+  date_modified timestamp
+}
+Ref fixture_header_season_id {
+  fixture_header.season_id > season.id
+}
+Ref fixture_header_team_a {
+  fixture_header.team_a > team.fpl_team_id
+}
+Ref fixture_header_team_h {
+  fixture_header.team_h > team.fpl_team_id
+}
+Ref fixture_header_event {
+  fixture_header.event > event.id
 }
 
 Table default_slate_header {
@@ -263,6 +278,9 @@ Table default_slate_header {
   date_created timestamp
   date_modified timestamp
 }
+Ref default_slate_header_event_id {
+  default_slate_header.event_id - event.id
+}
 
 Table default_slate_entries {
   id integer PK
@@ -271,11 +289,18 @@ Table default_slate_entries {
   date_created timestamp
   date_modified timestamp
 }
+Ref default_slate_entries_default_slate_header_id {
+  default_slate_entries.default_slate_header_id > default_slate_header.id
+}
+Ref default_slate_entries_fixture_id {
+  default_slate_entries.fixture_id - fixture_header.id
+}
 
 Table contest_slate_header {
   id integer PK
   contest_header_id integer
   event_id integer
+  from_default boolean
   is_active boolean
   start_date timestamp
   end_date timestamp
@@ -286,6 +311,9 @@ Table contest_slate_header {
   date_created timestamp
   date_modified timestamp
 }
+Ref contest_slate_header_contest_header {
+  contest_slate_header.contest_header_id > contest_header.id
+}
 
 Table contest_slate_entry {
   id integer PK
@@ -294,6 +322,28 @@ Table contest_slate_entry {
   date_created timestamp
   date_modified timestamp
 }
+Ref contest_slate_entry_contest_slate_header_id {
+  contest_slate_entry.contest_slate_header_id > contest_slate_header.id
+}
+Ref contest_slate_entry_fixture_id {
+  contest_slate_entry.fixture_id > fixture_header.id
+}
+
+
+Table content_slate_header_default_header {
+  id integer PK
+  contest_slate_header_id integer
+  default_slate_header_id integer
+  date_created timestamp
+  date_modified timestamp
+}
+Ref content_slate_header_default_header_default_slate_header_id {
+  content_slate_header_default_header.default_slate_header_id > default_slate_header.id
+}
+Ref content_slate_header_default_header_contest_slate_header_id {
+  content_slate_header_default_header.contest_slate_header_id > contest_slate_header.id
+}
+
 
 // This table contains all user predictions
 // For this contest
