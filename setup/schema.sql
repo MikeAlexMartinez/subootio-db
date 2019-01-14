@@ -84,7 +84,7 @@ GRANT USAGE ON predicts.user_role_id_seq TO predictsapiwrite;
 GRANT SELECT ON TABLE predicts.user_role TO predictsapiread;
 
 /**********************************************
- * 3. CREATE user_assigned_role Table                *
+ * 3. CREATE user_assigned_role Table         *
  *                                            *
  **********************************************/
 CREATE TABLE "predicts.user_assigned_role"
@@ -93,16 +93,29 @@ CREATE TABLE "predicts.user_assigned_role"
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
   /* Constraint */
   -- user_id
-  CONSTRAINT userconnections_user_id FOREIGN KEY (user_id)
+  CONSTRAINT user_assigned_role_user_id FOREIGN KEY (user_id)
     REFERENCES predicts.userheader (id),
-  -- follower_id
-  CONSTRAINT userconnections_follower_id FOREIGN KEY (follower_id)
-    REFERENCES predicts.userheader (id),
-
 )
-ALTER TABLE predicts.userconnections
+ALTER TABLE predicts.user_assigned_role
     OWNER to "%1$s";
-GRANT ALL ON TABLE predicts.userconnections TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.userconnections TO predictsapiwrite;
-GRANT USAGE ON predicts.userconnections_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.userconnections TO predictsapiread;
+GRANT ALL ON TABLE predicts.user_assigned_role TO "%1$s";
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_assigned_role TO predictsapiwrite;
+GRANT USAGE ON predicts.user_assigned_role_id_seq TO predictsapiwrite;
+GRANT SELECT ON TABLE predicts.user_assigned_role TO predictsapiread;
+
+/**********************************************
+ * 4. CREATE user_connection Table         *
+ *                                            *
+ **********************************************/
+CREATE TABLE "predicts.user_connection"
+(
+  "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  /* Constraint */
+)
+ALTER TABLE predicts.user_connection
+    OWNER to "%1$s";
+GRANT ALL ON TABLE predicts.user_connection TO "%1$s";
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_connection TO predictsapiwrite;
+GRANT USAGE ON predicts.user_connection_id_seq TO predictsapiwrite;
+GRANT SELECT ON TABLE predicts.user_connection TO predictsapiread;
