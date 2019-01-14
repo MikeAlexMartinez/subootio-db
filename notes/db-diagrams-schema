@@ -1,4 +1,21 @@
-Table admin_roles {
+Table user_header {
+  id integer PK,
+  email varchar,
+  first_name varchar,
+  last_name varchar,
+  phone_number varchar,
+  favorite_team varchar,
+  country varchar,
+  display_name varchar,
+  is_private boolean,
+  is_premium boolean,
+  password varchar,
+  publickey varchar,
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table user_role {
   id integer PK
   name varchar
   description varchar
@@ -6,30 +23,21 @@ Table admin_roles {
   date_modified timestamp
 }
 
-Table user_admin {
+Table user_assigned_role {
   id integer PK
-  email varchar
-  password varchar
-  admin_role_id integer
+  user_header_id integer
+  user_role_id integer
   date_created timestamp
   date_modified timestamp
 }
-Ref user_admin_admin_role_id {
-  user_admin.admin_role_id > admin_roles.id
+Ref user_assigned_role_user_header_id {
+  user_assigned_role.user_header_id > user_header.id
+}
+Ref user_assigned_role_user_role_id {
+  user_assigned_role.user_role_id > user_role.id
 }
 
-Table user_header {
-  id integer PK
-  email varchar
-  password varchar
-  publickey varchar
-  is_private boolean
-  is_premium boolean
-  date_created timestamp
-  date_modified timestamp
-}
-
-Table user_connections {
+Table user_connection {
   id integer PK
   user_id integer
   follower_id integer
@@ -39,39 +47,11 @@ Table user_connections {
   date_created timestamp
   date_modified timestamp
 }
-Ref user_connections_user_id {
-  user_connections.user_id > user_header.id 
+Ref user_connection_user_id {
+  user_connection.user_id > user_header.id 
 }
-Ref user_connections_follower_id {
-  user_connections.follower_id > user_header.id 
-}
-
-Table scoring_system_header {
-  id integer PK
-  is_custom integer
-  created_by integer
-  last_modified_by integer
-  date_created timestamp
-  date_modified timestamp
-}
-Ref scoring_system_header_created_by {
-  scoring_system_header.created_by > user_header.id
-}
-Ref scoring_system_header_last_modified_by {
-  scoring_system_header.last_modified_by > user_header.id
-}
-
-Table scoring_details {
-  id integer PK
-  name varchar
-  description varchar
-  type varchar
-  is_default boolean
-  created_by integer
-  points smallint
-  last_modified_by integer
-  date_created timestamp
-  date_modified timestamp
+Ref user_connection_follower_id {
+  user_connection.follower_id > user_header.id 
 }
 
 Table contest_header {
@@ -104,14 +84,51 @@ Ref contest_header_last_modified_by {
   contest_header.last_modified_by > user_header.id 
 }
 
-Table contest_scoring {
+Table scoring_system_header {
   id integer PK
   contest_header_id integer
-  scoring_system_header_id integer
-  is_active boolean
-  contest_slate_start integer
-  contest_slate_end integer
+  is_custom integer
+  created_by integer
+  last_modified_by integer
+  date_created timestamp
+  date_modified timestamp
 }
+Ref scoring_system_header_created_by {
+  scoring_system_header.created_by > user_header.id
+}
+Ref scoring_system_header_last_modified_by {
+  scoring_system_header.last_modified_by > user_header.id
+}
+Ref scoring_system_header_contest_header_id {
+  scoring_system_header.contest_header_id - contest_header.id
+}
+
+Table scoring_system_detail {
+  id integer PK
+  scoring_system_header_id integer
+  name varchar
+  description varchar
+  type varchar
+  is_active boolean
+  is_default boolean
+  created_by integer
+  start_date timestamp
+  end_date timestamp
+  points smallint
+  last_modified_by integer
+  date_created timestamp
+  date_modified timestamp
+}
+Ref scoring_system_detail_scoring_system_header_id {
+  scoring_system_detail.scoring_system_header_id > scoring_system_header.id  
+}
+Ref scoring_system_detail_last_modified_by {
+  scoring_system_detail.last_modified_by > user_header.id  
+}
+Ref scoring_system_detail_created_by {
+  scoring_system_detail.created_by > user_header.id  
+}
+
 
 Table user_invite {
   id integer PK
@@ -344,7 +361,6 @@ Ref content_slate_header_default_header_contest_slate_header_id {
   content_slate_header_default_header.contest_slate_header_id > contest_slate_header.id
 }
 
-
 // This table contains all user predictions
 // For this contest
 Table contest_result {
@@ -354,23 +370,36 @@ Table contest_result {
   home_score integer
   away_score integer
   expected_result varchar(2)
+  home_score_matches boolean
+  away_score_matches boolean
   scores_matches boolean
   result_matches boolean
   is_banker boolean
   has_started boolean
   has_finished boolean
-  points_scored smallint
-  deadline timestamp
+  deadline_time timestamp
   date_created timestamp
   date_modified timestamp
 }
+Ref contest_result_contest_slate_entry_id {
+  contest_result.contest_slate_entry_id > contest_slate_entry.id
+}
+Ref contest_result_contest_user_id {
+  contest_result.contest_user_id > contest_user.id
+}
 
-// This table contains player points totals for each week
-Table contest_points {
+Table contest_result_scoring {
   id integer PK
-  contest_slate_header_id integer
-  contest_user_id integer
-  total_points integer
+  scoring_system_detail_id integer
+  contest_result_id integer
+  points_available integer
+  points_scored integer
   date_created timestamp
   date_modified timestamp
+}
+Ref contest_result_scoring_contest_result_id {
+  contest_result_scoring.contest_result_id > contest_result.id
+}
+Ref contest_result_scoring_scoring_system_detail_id {
+  contest_result_scoring.scoring_system_detail_id > scoring_system_detail.id
 }
