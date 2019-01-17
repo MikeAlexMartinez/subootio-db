@@ -102,7 +102,7 @@ CREATE TABLE "user_invite" (
 
 CREATE TABLE "successful_invite_user" (
   "id" integer,
-  "userinvite_id" integer,
+  "user_invite_id" integer,
   "new_user_id" integer,
   "date_created" timestamp,
   "date_modified" timestamp
@@ -316,7 +316,7 @@ ALTER TABLE "user_invite" ADD FOREIGN KEY ("invite_creator") REFERENCES "user_he
 
 ALTER TABLE "user_header" ADD FOREIGN KEY ("id") REFERENCES "successful_invite_user" ("new_user_id");
 
-ALTER TABLE "user_invite" ADD FOREIGN KEY ("id") REFERENCES "successful_invite_user" ("userinvite_id");
+ALTER TABLE "user_invite" ADD FOREIGN KEY ("id") REFERENCES "successful_invite_user" ("user_invite_id");
 
 ALTER TABLE "contest_user" ADD FOREIGN KEY ("contest_header_id") REFERENCES "contest_header" ("id");
 
