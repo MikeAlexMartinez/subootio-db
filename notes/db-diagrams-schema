@@ -256,7 +256,7 @@ Table fixture_header {
   code integer
   deadline_time timestamp
   deadline_time_formatted varchar
-  event integer
+  event_id integer
   event_day smallint
   finished boolean
   finished_provisional boolean
@@ -330,6 +330,9 @@ Table contest_slate_header {
 }
 Ref contest_slate_header_contest_header {
   contest_slate_header.contest_header_id > contest_header.id
+}
+Ref contest_slate_header_event_id {
+  contest_slate_header.event_id > event.id
 }
 
 Table contest_slate_entry {

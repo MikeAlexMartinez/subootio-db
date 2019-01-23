@@ -342,19 +342,19 @@ CREATE TABLE "predicts.contest_user"
   /* Constraint */
   -- contest_header_id
   CONSTRAINT contest_user_contest_header_id FOREIGN KEY (contest_header_id)
-    REFERENCES predicts.contest_header (id)
+    REFERENCES predicts.contest_header (id),
   -- participant_type_id
   CONSTRAINT contest_user_participant_type_id FOREIGN KEY (participant_type_id)
-    REFERENCES predicts.participant_type (id)
+    REFERENCES predicts.participant_type (id),
   -- user_id
   CONSTRAINT contest_user_user_id FOREIGN KEY (user_id)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user_header (id),
   -- invite_status_id
   CONSTRAINT contest_user_invite_status_id FOREIGN KEY (invite_status_id)
-    REFERENCES predicts.invite_status (id)
+    REFERENCES predicts.invite_status (id),
   -- created_by
   CONSTRAINT contest_user_created_by FOREIGN KEY (created_by)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user_header (id),
   -- invited_by
   CONSTRAINT contest_user_invited_by FOREIGN KEY (invited_by)
     REFERENCES predicts.user_header (id)
@@ -401,9 +401,17 @@ GRANT SELECT ON TABLE predicts.team TO predictsapiread;
  **********************************************/
 CREATE TABLE "predicts.season"
 (
+  "id" SERIAL PRIMARY KEY,
+  "competition" VARCHAR,
+  "start_year" INTEGER,
+  "end_year" INTEGER,
+  "is_current" BOOLEAN,
+  "is_previous" BOOLEAN,
+  "is_next" BOOLEAN,
+  "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-  /* Constraint */
 )
 ALTER TABLE predicts.season
     OWNER to "%1$s";
@@ -418,9 +426,28 @@ GRANT SELECT ON TABLE predicts.season TO predictsapiread;
  **********************************************/
 CREATE TABLE "predicts.event"
 (
+  "id" SERIAL PRIMARY KEY,
+  "fpl_event_id" INTEGER,
+  "season_id" INTEGER, -- FK CONSTRAINT
+  "average_entry_score" INTEGER,
+  "data_checked" BOOLEAN,
+  "deadline_time" timestamp,
+  "deadline_time_epoch" INTEGER,
+  "deadline_time_formatted" VARCHAR,
+  "deadline_time_game_offset" INTEGER,
+  "finished" BOOLEAN,
+  "highest_score" INTEGER,
+  "highest_scoring_entry" INTEGER,
+  "is_current" BOOLEAN,
+  "is_next" BOOLEAN,
+  "is_previous" BOOLEAN,
+  "name" VARCHAR,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- season_id
+  CONSTRAINT event_season_id FOREIGN KEY (season_id)
+    REFERENCES predicts.season (id)
 )
 ALTER TABLE predicts.event
     OWNER to "%1$s";
@@ -435,9 +462,44 @@ GRANT SELECT ON TABLE predicts.event TO predictsapiread;
  **********************************************/
 CREATE TABLE "predicts.fixture_header"
 (
+  "id" SERIAL PRIMARY KEY,
+  "fpl_fixture_id" INTEGER,
+  "season_id" INTEGER, -- FK CONSTRAINT
+  "fantasy_id" INTEGER,
+  "code" INTEGER,
+  "deadline_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "deadline_time_formatted" VARCHAR,
+  "event_id" INTEGER, -- FK CONSTRAINT
+  "event_day" SMALLINT,
+  "finished" BOOLEAN,
+  "finished_provisional" BOOLEAN,
+  "kickoff_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "kickoff_time_formatted" VARCHAR,
+  "minutes" SMALLINT,
+  "provisional_start_time" BOOLEAN,
+  "started" BOOLEAN,
+  "team_a" INTEGER, -- FK CONSTRAINT
+  "team_a_score" SMALLINT,
+  "team_h" INTEGER, -- FK CONSTRAINT
+  "team_h_score" SMALLINT,
+  "result" VARCHAR(2),
+  "last_modified_by" INTEGER,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- season_id
+  CONSTRAINT fixture_header_season_id FOREIGN KEY (season_id)
+    REFERENCES predicts.season (season_id),
+  -- event_id
+  CONSTRAINT fixture_header_event_id FOREIGN KEY (event_id)
+    REFERENCES predicts.event (id),
+  -- team_a
+  CONSTRAINT fixture_header_team_a FOREIGN KEY (team_a)
+    REFERENCES predicts.team (fpl_team_id),
+  -- team_h
+  CONSTRAINT fixture_header_team_h FOREIGN KEY (team_h)
+    REFERENCES predicts.team (fpl_team_id)
+
 )
 ALTER TABLE predicts.fixture_header
     OWNER to "%1$s";
@@ -452,9 +514,16 @@ GRANT SELECT ON TABLE predicts.fixture_header TO predictsapiread;
  **********************************************/
 CREATE TABLE "predicts.default_slate_header"
 (
+  "id" SERIAL PRIMARY KEY,
+  "source" VARCHAR,
+  "type" VARCHAR,
+  "event_id" INTEGER, -- FK CONSTRAINT
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- event_id
+  CONSTRAINT default_slate_header_event_id FOREIGN KEY (event_id)
+    REFERENCES predicts.event (id)
 )
 ALTER TABLE predicts.default_slate_header
     OWNER to "%1$s";
@@ -469,9 +538,18 @@ GRANT SELECT ON TABLE predicts.default_slate_header TO predictsapiread;
  **********************************************/
 CREATE TABLE "predicts.default_slate_entries"
 (
+  "id" SERIAL PRIMARY KEY,
+  "default_slate_header_id" INTEGER, -- FK CONSTRAINT
+  "fixture_id" INTEGER, -- FK CONSTRAINT
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- default_slate_header_id
+  CONSTRAINT default_slate_entries_default_slate_header_id FOREIGN KEY (default_slate_header_id)
+    REFERENCES predicts.default_slate_header (id),
+  -- fixture_id
+  CONSTRAINT default_slate_entries_fixture_id FOREIGN KEY (fixture_id)
+    REFERENCES predicts.fixture_id (fixture_id)
 )
 ALTER TABLE predicts.default_slate_entries
     OWNER to "%1$s";
@@ -486,9 +564,26 @@ GRANT SELECT ON TABLE predicts.default_slate_entries TO predictsapiread;
  **********************************************/
 CREATE TABLE "predicts.contest_slate_header"
 (
+  "id" SERIAL PRIMARY KEY,
+  "contest_header_id" INTEGER, -- FK CONSTRAINT
+  "event_id" INTEGER, -- FK CONSTRAINT
+  "from_default" BOOLEAN,
+  "is_active" BOOLEAN,
+  "start_date" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "end_date" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "has_started" BOOLEAN,
+  "has_finished" BOOLEAN,
+  "total_possible_entries" INTEGER,
+  "total_entries" INTEGER,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- contest_header_id
+  CONSTRAINT contest_slate_header_contest_header_id FOREIGN KEY (contest_header_id)
+    REFERENCES predicts.contest_header (id),
+  -- event_id
+  CONSTRAINT contest_slate_header_event_id FOREIGN KEY (event_id)
+    REFERENCES predicts.event (id)
 )
 ALTER TABLE predicts.contest_slate_header
     OWNER to "%1$s";
@@ -503,9 +598,18 @@ GRANT SELECT ON TABLE predicts.contest_slate_header TO predictsapiread;
  **********************************************/
 CREATE TABLE "predicts.contest_slate_entry"
 (
+  "id" SERIAL PRIMARY KEY,
+  "contest_slate_header_id" INTEGER,
+  "fixture_id" INTEGER,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- contest_slate_header_id
+  CONSTRAINT contest_slate_entry_contest_slate_header_id  FOREIGN KEY (contest_slate_header_id)
+    REFERENCES predicts.contest_slate_header (id),
+  -- fixture_id
+  CONSTRAINT contest_slate_entry_fixture_id FOREIGN KEY (fixture_id)
+    REFERENCES predicts.fixture_header (id)
 )
 ALTER TABLE predicts.contest_slate_entry
     OWNER to "%1$s";
@@ -520,9 +624,18 @@ GRANT SELECT ON TABLE predicts.contest_slate_entry TO predictsapiread;
  *********************************************************/
 CREATE TABLE "predicts.contest_slate_header_default_header"
 (
+  "id" SERIAL PRIMARY KEY,
+  "contest_slate_header_id" INTEGER,
+  "default_slate_header_id" INTEGER,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- contest_slate_header_id
+  CONSTRAINT contest_slate_header_default_header_contest_slate_header_id FOREIGN KEY (contest_slate_header_id)
+    REFERENCES predicts.contest_slate_header (id),
+  -- default_slate_header_id
+  CONSTRAINT contest_slate_header_default_header_default_slate_header_id FOREIGN KEY (default_slate_header_id)
+    REFERENCES predicts.default_slate_header (id)
 )
 ALTER TABLE predicts.contest_slate_header_default_header
     OWNER to "%1$s";
@@ -537,9 +650,29 @@ GRANT SELECT ON TABLE predicts.contest_slate_header_default_header TO predictsap
  **********************************************/
 CREATE TABLE "predicts.contest_result"
 (
+  "id" SERIAL PRIMARY KEY,
+  "contest_slate_entry_id" INTEGER, -- FK CONSTRAINT
+  "contest_user_id" INTEGER, -- FK CONSTRAINT
+  "home_score" INTEGER,
+  "away_score" INTEGER,
+  "expected_result" VARCHAR(2),
+  "home_score_matches" BOOLEAN,
+  "away_score_matches" BOOLEAN,
+  "scores_matches" BOOLEAN,
+  "result_matches" BOOLEAN,
+  "is_banker" BOOLEAN,
+  "has_started" BOOLEAN,
+  "has_finished" BOOLEAN,
+  "deadline_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- contest_slate_entry_id
+  CONSTRAINT contest_result_contest_slate_entry_id FOREIGN KEY (contest_slate_entry_id)
+    REFERENCES predicts.contest_slate_entry (id),
+  -- contest_user_id
+  CONSTRAINT contest_result_contest_user_id FOREIGN KEY (contest_user_id)
+    REFERENCES predicts.contest_user (id)
 )
 ALTER TABLE predicts.contest_result
     OWNER to "%1$s";
@@ -554,9 +687,20 @@ GRANT SELECT ON TABLE predicts.contest_result TO predictsapiread;
  **********************************************/
 CREATE TABLE "predicts.contest_result_scoring"
 (
+  "id" SERIAL PRIMARY KEY,
+  "scoring_system_detail_id" INTEGER,
+  "contest_result_id" INTEGER,
+  "points_available" INTEGER,
+  "points_scored" INTEGER,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
+  -- scoring_system_detail_id
+  CONSTRAINT contest_result_scoring_scoring_system_detail_id FOREIGN KEY (scoring_system_detail_id)
+    REFERENCES predicts.scoring_system_detail (id),
+  -- contest_result_id
+  CONSTRAINT contest_result_contest_result_id FOREIGN KEY (contest_result_id)
+    REFERENCES predicts.contest_result (id)
 )
 ALTER TABLE predicts.contest_result_scoring
     OWNER to "%1$s";
