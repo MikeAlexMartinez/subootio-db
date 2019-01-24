@@ -8,6 +8,9 @@ function createUser({ activePool, user }) {
   return new Promise(async (res, rej) => {
     let dbClient;
 
+    if (!activePool) {
+      rej(new Error(`activePool is required for db connection`));
+    }
     if (!user) {
       rej(new Error(`no user to create`));
     }
@@ -21,7 +24,7 @@ function createUser({ activePool, user }) {
     }
 
     try {
-      dbClient = await activePool.pool.connect();
+      dbClient = await activePool.connect();
       await dbClient.query('BEGIN');
       const sql = format(`
         DO

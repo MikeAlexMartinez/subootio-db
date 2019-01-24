@@ -27,8 +27,8 @@
 
 CREATE SCHEMA IF NOT EXISTS predicts AUTHORIZATION "%1$s";
 
-GRANT USAGE ON SCHEMA predicts TO predictsapiwrite;
-GRANT USAGE ON SCHEMA predicts TO predictsapiread;
+GRANT USAGE ON SCHEMA predicts TO "%2$s";
+GRANT USAGE ON SCHEMA predicts TO "%3$s";
 
 /**********************************************
  * 1. CREATE user_header Table                 *
@@ -56,10 +56,10 @@ ALTER TABLE predicts.user_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.user_header TO "%1$s";
 -- Give necessary instructions to write user
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_header TO predictsapiwrite;
-GRANT USAGE ON predicts.user_header_id_seq TO predictsapiwrite;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_header TO "%2$s";
+GRANT USAGE ON predicts.user_header_id_seq TO "%2$s";
 -- Give necessary instructions to read user
-GRANT SELECT ON TABLE predicts.user_header TO predictsapiread;
+GRANT SELECT ON TABLE predicts.user_header TO "%3$s";
 
 /**********************************************
  * 2. CREATE user_role Table                *
@@ -78,10 +78,10 @@ ALTER TABLE predicts.user_role
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.user_role TO "%1$s";
 -- Give necessary instructions to write user
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_role TO predictsapiwrite;
-GRANT USAGE ON predicts.user_role_id_seq TO predictsapiwrite;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_role TO "%2$s";
+GRANT USAGE ON predicts.user_role_id_seq TO "%2$s";
 -- Give necessary instructions to read user
-GRANT SELECT ON TABLE predicts.user_role TO predictsapiread;
+GRANT SELECT ON TABLE predicts.user_role TO "%3$s";
 
 /**********************************************
  * 3. CREATE user_assigned_role Table         *
@@ -105,9 +105,9 @@ CREATE TABLE "predicts.user_assigned_role"
 ALTER TABLE predicts.user_assigned_role
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.user_assigned_role TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_assigned_role TO predictsapiwrite;
-GRANT USAGE ON predicts.user_assigned_role_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.user_assigned_role TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_assigned_role TO "%2$s";
+GRANT USAGE ON predicts.user_assigned_role_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.user_assigned_role TO "%3$s";
 
 /**********************************************
  * 4. CREATE user_connection Table            *
@@ -130,14 +130,13 @@ CREATE TABLE "predicts.user_connection"
   -- follower_id
   CONSTRAINT user_connection_follower_id FOREIGN KEY (follower_id)
     REFERENCES predicts.user_header (id)
-
 )
 ALTER TABLE predicts.user_connection
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.user_connection TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_connection TO predictsapiwrite;
-GRANT USAGE ON predicts.user_connection_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.user_connection TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_connection TO "%2$s";
+GRANT USAGE ON predicts.user_connection_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.user_connection TO "%3$s";
 
 /**********************************************
  * 5. CREATE contest_header Table             *
@@ -177,9 +176,9 @@ CREATE TABLE "predicts.contest_header"
 ALTER TABLE predicts.contest_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_header TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_header TO predictsapiwrite;
-GRANT USAGE ON predicts.contest_header_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.contest_header TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_header TO "%2$s";
+GRANT USAGE ON predicts.contest_header_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.contest_header TO "%3$s";
 
 /**********************************************
  * 6. CREATE scoring_system_header Table      *
@@ -208,9 +207,9 @@ CREATE TABLE "predicts.scoring_system_header"
 ALTER TABLE predicts.scoring_system_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.scoring_system_header TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.scoring_system_header TO predictsapiwrite;
-GRANT USAGE ON predicts.scoring_system_header_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.scoring_system_header TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.scoring_system_header TO "%2$s";
+GRANT USAGE ON predicts.scoring_system_header_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.scoring_system_header TO "%3$s";
 
 /**********************************************
  * 7. CREATE scoring_system_detail Table      *
@@ -246,9 +245,9 @@ CREATE TABLE "predicts.scoring_system_detail"
 ALTER TABLE predicts.scoring_system_detail
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.scoring_system_detail TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.scoring_system_detail TO predictsapiwrite;
-GRANT USAGE ON predicts.scoring_system_detail_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.scoring_system_detail TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.scoring_system_detail TO "%2$s";
+GRANT USAGE ON predicts.scoring_system_detail_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.scoring_system_detail TO "%3$s";
 
 /**********************************************
  * 8. CREATE user_invite Table                *
@@ -271,9 +270,9 @@ CREATE TABLE "predicts.user_invite"
 ALTER TABLE predicts.user_invite
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.user_invite TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_invite TO predictsapiwrite;
-GRANT USAGE ON predicts.user_invite_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.user_invite TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_invite TO "%2$s";
+GRANT USAGE ON predicts.user_invite_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.user_invite TO "%3$s";
 
 /**********************************************
  * 9. CREATE successful_invite_user Table     *
@@ -297,9 +296,9 @@ CREATE TABLE "predicts.successful_invite_user"
 ALTER TABLE predicts.successful_invite_user
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.successful_invite_user TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.successful_invite_user TO predictsapiwrite;
-GRANT USAGE ON predicts.successful_invite_user_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.successful_invite_user TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.successful_invite_user TO "%2$s";
+GRANT USAGE ON predicts.successful_invite_user_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.successful_invite_user TO "%3$s";
 
 /**********************************************
  * 10. CREATE participant_type Table          *
@@ -316,9 +315,9 @@ CREATE TABLE "predicts.participant_type"
 ALTER TABLE predicts.participant_type
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.participant_type TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.participant_type TO predictsapiwrite;
-GRANT USAGE ON predicts.participant_type_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.participant_type TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.participant_type TO "%2$s";
+GRANT USAGE ON predicts.participant_type_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.participant_type TO "%3$s";
 
 /**********************************************
  * 11. CREATE contest_user Table              *
@@ -362,9 +361,9 @@ CREATE TABLE "predicts.contest_user"
 ALTER TABLE predicts.contest_user
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_user TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_user TO predictsapiwrite;
-GRANT USAGE ON predicts.contest_user_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.contest_user TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_user TO "%2$s";
+GRANT USAGE ON predicts.contest_user_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.contest_user TO "%3$s";
 
 /**********************************************
  * 12. CREATE team Table                      *
@@ -391,9 +390,9 @@ CREATE TABLE "predicts.team"
 ALTER TABLE predicts.team
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.team TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.team TO predictsapiwrite;
-GRANT USAGE ON predicts.team_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.team TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.team TO "%2$s";
+GRANT USAGE ON predicts.team_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.team TO "%3$s";
 
 /**********************************************
  * 13. CREATE season Table                    *
@@ -416,9 +415,9 @@ CREATE TABLE "predicts.season"
 ALTER TABLE predicts.season
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.season TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.season TO predictsapiwrite;
-GRANT USAGE ON predicts.season_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.season TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.season TO "%2$s";
+GRANT USAGE ON predicts.season_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.season TO "%3$s";
 
 /**********************************************
  * 14. CREATE event Table                     *
@@ -452,9 +451,9 @@ CREATE TABLE "predicts.event"
 ALTER TABLE predicts.event
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.event TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.event TO predictsapiwrite;
-GRANT USAGE ON predicts.event_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.event TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.event TO "%2$s";
+GRANT USAGE ON predicts.event_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.event TO "%3$s";
 
 /**********************************************
  * 15. CREATE fixture_header Table            *
@@ -504,9 +503,9 @@ CREATE TABLE "predicts.fixture_header"
 ALTER TABLE predicts.fixture_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.fixture_header TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.fixture_header TO predictsapiwrite;
-GRANT USAGE ON predicts.fixture_header_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.fixture_header TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.fixture_header TO "%2$s";
+GRANT USAGE ON predicts.fixture_header_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.fixture_header TO "%3$s";
 
 /**********************************************
  * 16. CREATE default_slate_header Table      *
@@ -528,9 +527,9 @@ CREATE TABLE "predicts.default_slate_header"
 ALTER TABLE predicts.default_slate_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.default_slate_header TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.default_slate_header TO predictsapiwrite;
-GRANT USAGE ON predicts.default_slate_header_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.default_slate_header TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.default_slate_header TO "%2$s";
+GRANT USAGE ON predicts.default_slate_header_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.default_slate_header TO "%3$s";
 
 /**********************************************
  * 17. CREATE default_slate_entries Table     *
@@ -554,9 +553,9 @@ CREATE TABLE "predicts.default_slate_entries"
 ALTER TABLE predicts.default_slate_entries
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.default_slate_entries TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.default_slate_entries TO predictsapiwrite;
-GRANT USAGE ON predicts.default_slate_entries_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.default_slate_entries TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.default_slate_entries TO "%2$s";
+GRANT USAGE ON predicts.default_slate_entries_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.default_slate_entries TO "%3$s";
 
 /**********************************************
  * 18. CREATE contest_slate_header Table      *
@@ -588,9 +587,9 @@ CREATE TABLE "predicts.contest_slate_header"
 ALTER TABLE predicts.contest_slate_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_slate_header TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_slate_header TO predictsapiwrite;
-GRANT USAGE ON predicts.contest_slate_header_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.contest_slate_header TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_slate_header TO "%2$s";
+GRANT USAGE ON predicts.contest_slate_header_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.contest_slate_header TO "%3$s";
 
 /**********************************************
  * 19. CREATE contest_slate_entry Table       *
@@ -614,9 +613,9 @@ CREATE TABLE "predicts.contest_slate_entry"
 ALTER TABLE predicts.contest_slate_entry
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_slate_entry TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_slate_entry TO predictsapiwrite;
-GRANT USAGE ON predicts.contest_slate_entry_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.contest_slate_entry TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_slate_entry TO "%2$s";
+GRANT USAGE ON predicts.contest_slate_entry_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.contest_slate_entry TO "%3$s";
 
 /*********************************************************
  * 20. CREATE contest_slate_header_default_header Table  *
@@ -640,9 +639,9 @@ CREATE TABLE "predicts.contest_slate_header_default_header"
 ALTER TABLE predicts.contest_slate_header_default_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_slate_header_default_header TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_slate_header_default_header TO predictsapiwrite;
-GRANT USAGE ON predicts.contest_slate_header_default_header_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.contest_slate_header_default_header TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_slate_header_default_header TO "%2$s";
+GRANT USAGE ON predicts.contest_slate_header_default_header_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.contest_slate_header_default_header TO "%3$s";
 
 /**********************************************
  * 21. CREATE contest_result Table            *
@@ -677,9 +676,9 @@ CREATE TABLE "predicts.contest_result"
 ALTER TABLE predicts.contest_result
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_result TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_result TO predictsapiwrite;
-GRANT USAGE ON predicts.contest_result_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.contest_result TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_result TO "%2$s";
+GRANT USAGE ON predicts.contest_result_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.contest_result TO "%3$s";
 
 /**********************************************
  * 22. CREATE contest_result_scoring Table    *
@@ -705,6 +704,6 @@ CREATE TABLE "predicts.contest_result_scoring"
 ALTER TABLE predicts.contest_result_scoring
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_result_scoring TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_result_scoring TO predictsapiwrite;
-GRANT USAGE ON predicts.contest_result_scoring_id_seq TO predictsapiwrite;
-GRANT SELECT ON TABLE predicts.contest_result_scoring TO predictsapiread;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_result_scoring TO "%2$s";
+GRANT USAGE ON predicts.contest_result_scoring_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.contest_result_scoring TO "%3$s";
