@@ -1,0 +1,32 @@
+{
+  "name": "subootio-db",
+  "version": "0.0.1",
+  "description": "manages my database for subootio",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikeAlexMartinez/subootio-db.git"
+  },
+  "author": "Michael Martinez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MikeAlexMartinez/subootio-db/issues"
+  },
+  "homepage": "https://github.com/MikeAlexMartinez/subootio-db#readme",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "dotenv-safe": "^6.1.0",
+    "lodash": "^4.17.11",
+    "pg": "^7.8.0",
+    "pg-format": "^1.0.4",
+    "xlsx": "^0.14.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "rewire": "^4.0.1"
+  }
+}
