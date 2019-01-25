@@ -2,26 +2,26 @@
  * Build DB
  **/
 
-/* 24. */ DROP TABLE IF EXISTS predicts.contest_result_scoring;
-/* 23. */ DROP TABLE IF EXISTS predicts.contest_result;
-/* 22. */ DROP TABLE IF EXISTS predicts.contest_slate_header_default_header;
-/* 21. */ DROP TABLE IF EXISTS predicts.contest_slate_entry;
-/* 20. */ DROP TABLE IF EXISTS predicts.contest_slate_header;
-/* 19. */ DROP TABLE IF EXISTS predicts.default_slate_entries;
-/* 18. */ DROP TABLE IF EXISTS predicts.default_slate_header;
-/* 17. */ DROP TABLE IF EXISTS predicts.fixture_header;
-/* 16. */ DROP TABLE IF EXISTS predicts.event;
-/* 15. */ DROP TABLE IF EXISTS predicts.season;
-/* 14. */ DROP TABLE IF EXISTS predicts.team;
-/* 13. */ DROP TABLE IF EXISTS predicts.contest_invite_application;
-/* 12. */ DROP TABLE IF EXISTS predicts.contest_invite_type;
-/* 11. */ DROP TABLE IF EXISTS predicts.contest_user;
-/* 10. */ DROP TABLE IF EXISTS predicts.participant_type;
-/* 9.  */ DROP TABLE IF EXISTS predicts.successful_invite_user;
-/* 8.  */ DROP TABLE IF EXISTS predicts.user_invite;
-/* 7.  */ DROP TABLE IF EXISTS predicts.scoring_system_detail;
-/* 6.  */ DROP TABLE IF EXISTS predicts.scoring_system_header;
-/* 5.  */ DROP TABLE IF EXISTS predicts.contest_header;
+/* 25. */ DROP TABLE IF EXISTS predicts.contest_result_scoring;
+/* 24. */ DROP TABLE IF EXISTS predicts.contest_result;
+/* 23. */ DROP TABLE IF EXISTS predicts.contest_slate_header_default_header;
+/* 22. */ DROP TABLE IF EXISTS predicts.contest_slate_entry;
+/* 21. */ DROP TABLE IF EXISTS predicts.contest_slate_header;
+/* 20. */ DROP TABLE IF EXISTS predicts.default_slate_entries;
+/* 19. */ DROP TABLE IF EXISTS predicts.default_slate_header;
+/* 18. */ DROP TABLE IF EXISTS predicts.fixture_header;
+/* 17. */ DROP TABLE IF EXISTS predicts.event;
+/* 16. */ DROP TABLE IF EXISTS predicts.season;
+/* 15. */ DROP TABLE IF EXISTS predicts.team;
+/* 14. */ DROP TABLE IF EXISTS predicts.contest_invite_application;
+/* 13. */ DROP TABLE IF EXISTS predicts.contest_invite_type;
+/* 12. */ DROP TABLE IF EXISTS predicts.contest_user;
+/* 11. */ DROP TABLE IF EXISTS predicts.participant_type;
+/* 10. */ DROP TABLE IF EXISTS predicts.successful_invite_user;
+/* 9.  */ DROP TABLE IF EXISTS predicts.user_invite;
+/* 8.  */ DROP TABLE IF EXISTS predicts.scoring_system_detail;
+/* 7.  */ DROP TABLE IF EXISTS predicts.scoring_system_header;
+/* 6.  */ DROP TABLE IF EXISTS predicts.contest_header;
 /* 5.  */ DROP TABLE IF EXISTS predicts.contest_type;
 /* 4.  */ DROP TABLE IF EXISTS predicts.user_connection;
 /* 3.  */ DROP TABLE IF EXISTS predicts.user_assigned_role;
@@ -163,7 +163,7 @@ GRANT USAGE ON predicts.contest_type_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_type TO "%3$s";
 
 /**********************************************
- * 5. CREATE contest_header Table             *
+ * 6. CREATE contest_header Table             *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.contest_header
@@ -209,7 +209,7 @@ GRANT USAGE ON predicts.contest_header_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_header TO "%3$s";
 
 /**********************************************
- * 6. CREATE scoring_system_header Table      *
+ * 7. CREATE scoring_system_header Table      *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.scoring_system_header
@@ -240,7 +240,7 @@ GRANT USAGE ON predicts.scoring_system_header_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.scoring_system_header TO "%3$s";
 
 /**********************************************
- * 7. CREATE scoring_system_detail Table      *
+ * 8. CREATE scoring_system_detail Table      *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.scoring_system_detail
@@ -278,7 +278,7 @@ GRANT USAGE ON predicts.scoring_system_detail_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.scoring_system_detail TO "%3$s";
 
 /**********************************************
- * 8. CREATE user_invite Table                *
+ * 9. CREATE user_invite Table                *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.user_invite
@@ -303,7 +303,7 @@ GRANT USAGE ON predicts.user_invite_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.user_invite TO "%3$s";
 
 /**********************************************
- * 9. CREATE successful_invite_user Table     *
+ * 10. CREATE successful_invite_user Table     *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.successful_invite_user
@@ -329,7 +329,7 @@ GRANT USAGE ON predicts.successful_invite_user_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.successful_invite_user TO "%3$s";
 
 /**********************************************
- * 10. CREATE participant_type Table          *
+ * 11. CREATE participant_type Table          *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.participant_type
@@ -348,7 +348,7 @@ GRANT USAGE ON predicts.participant_type_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.participant_type TO "%3$s";
 
 /**********************************************
- * 11. CREATE contest_user Table              *
+ * 12. CREATE contest_user Table              *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.contest_user
@@ -390,7 +390,7 @@ GRANT USAGE ON predicts.contest_user_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_user TO "%3$s";
 
 /**********************************************
- * 12. CREATE contest_invite_type Table       *
+ * 13. CREATE contest_invite_type Table       *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.contest_invite_type
@@ -411,7 +411,7 @@ GRANT USAGE ON predicts.contest_invite_type_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_invite_type TO "%3$s";
 
 /************************************************
- * 13. CREATE contest_invite_application Table  *
+ * 14. CREATE contest_invite_application Table  *
  *                                              *
  ************************************************/
 CREATE TABLE predicts.contest_invite_application
@@ -450,13 +450,13 @@ GRANT USAGE ON predicts.contest_invite_application_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_invite_application TO "%3$s";
 
 /**********************************************
- * 12. CREATE team Table                      *
+ * 15. CREATE team Table                      *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.team
 (
   "code" INTEGER,
-  "fpl_team_id" INTEGER,
+  "fpl_team_id" INTEGER UNIQUE,
   "fantasy_id" INTEGER,
   "name" VARCHAR,
   "short_name" VARCHAR(3),
@@ -475,11 +475,10 @@ ALTER TABLE predicts.team
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.team TO "%1$s";
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.team TO "%2$s";
-GRANT USAGE ON predicts.team_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.team TO "%3$s";
 
 /**********************************************
- * 13. CREATE season Table                    *
+ * 16. CREATE season Table                    *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.season
@@ -502,7 +501,7 @@ GRANT USAGE ON predicts.season_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.season TO "%3$s";
 
 /**********************************************
- * 14. CREATE event Table                     *
+ * 17. CREATE event Table                     *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.event
@@ -538,7 +537,7 @@ GRANT USAGE ON predicts.event_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.event TO "%3$s";
 
 /**********************************************
- * 15. CREATE fixture_header Table            *
+ * 18. CREATE fixture_header Table            *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.fixture_header
@@ -570,7 +569,7 @@ CREATE TABLE predicts.fixture_header
   /* Constraint */
   -- season_id
   CONSTRAINT fixture_header_season_id FOREIGN KEY (season_id)
-    REFERENCES predicts.season (season_id),
+    REFERENCES predicts.season (id),
   -- event_id
   CONSTRAINT fixture_header_event_id FOREIGN KEY (event_id)
     REFERENCES predicts.event (id),
@@ -589,7 +588,7 @@ GRANT USAGE ON predicts.fixture_header_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.fixture_header TO "%3$s";
 
 /**********************************************
- * 16. CREATE default_slate_header Table      *
+ * 19. CREATE default_slate_header Table      *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.default_slate_header
@@ -613,7 +612,7 @@ GRANT USAGE ON predicts.default_slate_header_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.default_slate_header TO "%3$s";
 
 /**********************************************
- * 17. CREATE default_slate_entries Table     *
+ * 20. CREATE default_slate_entries Table     *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.default_slate_entries
@@ -629,7 +628,7 @@ CREATE TABLE predicts.default_slate_entries
     REFERENCES predicts.default_slate_header (id),
   -- fixture_id
   CONSTRAINT default_slate_entries_fixture_id FOREIGN KEY (fixture_id)
-    REFERENCES predicts.fixture_id (fixture_id)
+    REFERENCES predicts.fixture_header (id)
 );
 ALTER TABLE predicts.default_slate_entries
     OWNER to "%1$s";
@@ -639,7 +638,7 @@ GRANT USAGE ON predicts.default_slate_entries_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.default_slate_entries TO "%3$s";
 
 /**********************************************
- * 18. CREATE contest_slate_header Table      *
+ * 21. CREATE contest_slate_header Table      *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.contest_slate_header
@@ -673,7 +672,7 @@ GRANT USAGE ON predicts.contest_slate_header_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_slate_header TO "%3$s";
 
 /**********************************************
- * 19. CREATE contest_slate_entry Table       *
+ * 22. CREATE contest_slate_entry Table       *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.contest_slate_entry
@@ -699,7 +698,7 @@ GRANT USAGE ON predicts.contest_slate_entry_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_slate_entry TO "%3$s";
 
 /*********************************************************
- * 20. CREATE contest_slate_header_default_header Table  *
+ * 23. CREATE contest_slate_header_default_header Table  *
  *                                                       *
  *********************************************************/
 CREATE TABLE predicts.contest_slate_header_default_header
@@ -725,7 +724,7 @@ GRANT USAGE ON predicts.contest_slate_header_default_header_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_slate_header_default_header TO "%3$s";
 
 /**********************************************
- * 21. CREATE contest_result Table            *
+ * 24. CREATE contest_result Table            *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.contest_result
@@ -762,7 +761,7 @@ GRANT USAGE ON predicts.contest_result_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_result TO "%3$s";
 
 /**********************************************
- * 22. CREATE contest_result_scoring Table    *
+ * 25. CREATE contest_result_scoring Table    *
  *                                            *
  **********************************************/
 CREATE TABLE predicts.contest_result_scoring
