@@ -1,16 +1,10 @@
 CREATE TABLE "user_header" (
-  "id" SERIAL PRIMARY KEY,
-  "email" VARCHAR,
-  "first_name" VARCHAR,
-  "last_name" VARCHAR,
-  "phone_number" VARCHAR,
-  "favorite_team" VARCHAR,
-  "country" VARCHAR,
-  "display_name" VARCHAR,
-  "is_private" BOOLEAN,
-  "is_premium" BOOLEAN,
-  "password" VARCHAR,
-  "publickey" VARCHAR,
+  "id" integer,
+  "email" varchar,
+  "password" varchar,
+  "publickey" varchar,
+  "is_private" boolean,
+  "is_premium" boolean,
   "date_created" timestamp,
   "date_modified" timestamp
 );
@@ -42,6 +36,13 @@ CREATE TABLE "user_connection" (
   "date_modified" timestamp
 );
 
+CREATE TABLE "contest_type" (
+  "id" integer,
+  "name" varchar,
+  "date_created" timestamp,
+  "date_modified" timestamp
+);
+
 CREATE TABLE "contest_header" (
   "id" integer,
   "contest_name" varchar,
@@ -49,8 +50,7 @@ CREATE TABLE "contest_header" (
   "is_default" boolean,
   "created_by" integer,
   "current_owner" integer,
-  "is_public" boolean,
-  "is_private" boolean,
+  "contest_type_id" integer,
   "invitation_code" varchar,
   "start_date" timestamp,
   "end_date" timestamp,
@@ -122,7 +122,6 @@ CREATE TABLE "contest_user" (
   "participant_type_id" integer,
   "user_id" integer,
   "is_invited" boolean,
-  "invite_status_id" smallint,
   "is_active" boolean,
   "is_blocked" boolean,
   "balance" float,
@@ -178,7 +177,9 @@ CREATE TABLE "event" (
   "is_current" boolean,
   "is_next" boolean,
   "is_previous" boolean,
-  "name" varchar
+  "name" varchar,
+  "date_created" timestamp,
+  "date_modified" timestamp
 );
 
 CREATE TABLE "fixture_header" (
@@ -286,6 +287,25 @@ CREATE TABLE "contest_result_scoring" (
   "date_modified" timestamp
 );
 
+CREATE TABLE "contest_invite_type" (
+  "id" integer,
+  "name" varchar,
+  "date_created" timestamp,
+  "date_modified" timestamp
+);
+
+CREATE TABLE "contest_invite_application" (
+  "id" integer,
+  "contest_header_id" integer,
+  "contest_invite_type_id" integer,
+  "user_id" integer,
+  "is_confirmed" boolean,
+  "is_outstanding" boolean,
+  "responded_by" integer,
+  "date_created" timestamp,
+  "date_modified" timestamp
+);
+
 ALTER TABLE "user_assigned_role" ADD FOREIGN KEY ("user_header_id") REFERENCES "user_header" ("id");
 
 ALTER TABLE "user_assigned_role" ADD FOREIGN KEY ("user_role_id") REFERENCES "user_role" ("id");
@@ -299,6 +319,8 @@ ALTER TABLE "contest_header" ADD FOREIGN KEY ("created_by") REFERENCES "user_hea
 ALTER TABLE "contest_header" ADD FOREIGN KEY ("current_owner") REFERENCES "user_header" ("id");
 
 ALTER TABLE "contest_header" ADD FOREIGN KEY ("last_modified_by") REFERENCES "user_header" ("id");
+
+ALTER TABLE "contest_header" ADD FOREIGN KEY ("contest_type_id") REFERENCES "contest_type" ("id");
 
 ALTER TABLE "scoring_system_header" ADD FOREIGN KEY ("created_by") REFERENCES "user_header" ("id");
 
@@ -346,6 +368,8 @@ ALTER TABLE "fixture_header" ADD FOREIGN KEY ("id") REFERENCES "default_slate_en
 
 ALTER TABLE "contest_slate_header" ADD FOREIGN KEY ("contest_header_id") REFERENCES "contest_header" ("id");
 
+ALTER TABLE "contest_slate_header" ADD FOREIGN KEY ("event_id") REFERENCES "event" ("id");
+
 ALTER TABLE "contest_slate_entry" ADD FOREIGN KEY ("contest_slate_header_id") REFERENCES "contest_slate_header" ("id");
 
 ALTER TABLE "contest_slate_entry" ADD FOREIGN KEY ("fixture_id") REFERENCES "fixture_header" ("id");
@@ -361,3 +385,11 @@ ALTER TABLE "contest_result" ADD FOREIGN KEY ("contest_user_id") REFERENCES "con
 ALTER TABLE "contest_result_scoring" ADD FOREIGN KEY ("contest_result_id") REFERENCES "contest_result" ("id");
 
 ALTER TABLE "contest_result_scoring" ADD FOREIGN KEY ("scoring_system_detail_id") REFERENCES "scoring_system_detail" ("id");
+
+ALTER TABLE "contest_invite_application" ADD FOREIGN KEY ("contest_header_id") REFERENCES "contest_header" ("id");
+
+ALTER TABLE "contest_invite_application" ADD FOREIGN KEY ("contest_invite_type_id") REFERENCES "contest_invite_type" ("id");
+
+ALTER TABLE "contest_invite_application" ADD FOREIGN KEY ("user_id") REFERENCES "user_header" ("id");
+
+ALTER TABLE "contest_invite_application" ADD FOREIGN KEY ("responded_by") REFERENCES "user_header" ("id");

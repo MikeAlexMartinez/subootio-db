@@ -2,17 +2,19 @@
  * Build DB
  **/
 
-/* 22. */ DROP TABLE IF EXISTS predicts.contest_result_scoring;
-/* 21. */ DROP TABLE IF EXISTS predicts.contest_result;
-/* 20. */ DROP TABLE IF EXISTS predicts.contest_slate_header_default_header;
-/* 19. */ DROP TABLE IF EXISTS predicts.contest_slate_entry;
-/* 18. */ DROP TABLE IF EXISTS predicts.contest_slate_header;
-/* 17. */ DROP TABLE IF EXISTS predicts.default_slate_entries;
-/* 16. */ DROP TABLE IF EXISTS predicts.default_slate_header;
-/* 15. */ DROP TABLE IF EXISTS predicts.fixture_header;
-/* 14. */ DROP TABLE IF EXISTS predicts.event;
-/* 13. */ DROP TABLE IF EXISTS predicts.season;
-/* 12. */ DROP TABLE IF EXISTS predicts.team;
+/* 24. */ DROP TABLE IF EXISTS predicts.contest_result_scoring;
+/* 23. */ DROP TABLE IF EXISTS predicts.contest_result;
+/* 22. */ DROP TABLE IF EXISTS predicts.contest_slate_header_default_header;
+/* 21. */ DROP TABLE IF EXISTS predicts.contest_slate_entry;
+/* 20. */ DROP TABLE IF EXISTS predicts.contest_slate_header;
+/* 19. */ DROP TABLE IF EXISTS predicts.default_slate_entries;
+/* 18. */ DROP TABLE IF EXISTS predicts.default_slate_header;
+/* 17. */ DROP TABLE IF EXISTS predicts.fixture_header;
+/* 16. */ DROP TABLE IF EXISTS predicts.event;
+/* 15. */ DROP TABLE IF EXISTS predicts.season;
+/* 14. */ DROP TABLE IF EXISTS predicts.team;
+/* 13. */ DROP TABLE IF EXISTS predicts.contest_invite_application;
+/* 12. */ DROP TABLE IF EXISTS predicts.contest_invite_type;
 /* 11. */ DROP TABLE IF EXISTS predicts.contest_user;
 /* 10. */ DROP TABLE IF EXISTS predicts.participant_type;
 /* 9.  */ DROP TABLE IF EXISTS predicts.successful_invite_user;
@@ -20,6 +22,7 @@
 /* 7.  */ DROP TABLE IF EXISTS predicts.scoring_system_detail;
 /* 6.  */ DROP TABLE IF EXISTS predicts.scoring_system_header;
 /* 5.  */ DROP TABLE IF EXISTS predicts.contest_header;
+/* 5.  */ DROP TABLE IF EXISTS predicts.contest_type;
 /* 4.  */ DROP TABLE IF EXISTS predicts.user_connection;
 /* 3.  */ DROP TABLE IF EXISTS predicts.user_assigned_role;
 /* 2.  */ DROP TABLE IF EXISTS predicts.user_role;
@@ -34,7 +37,7 @@ GRANT USAGE ON SCHEMA predicts TO "%3$s";
  * 1. CREATE user_header Table                 *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.user_header"
+CREATE TABLE predicts.user_header
 (
   "id" SERIAL PRIMARY KEY,
   "email" VARCHAR,
@@ -50,7 +53,7 @@ CREATE TABLE "predicts.user_header"
   "publickey" VARCHAR,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-)
+);
 -- assign ownership to main db user
 ALTER TABLE predicts.user_header
     OWNER to "%1$s";
@@ -65,14 +68,14 @@ GRANT SELECT ON TABLE predicts.user_header TO "%3$s";
  * 2. CREATE user_role Table                *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.user_role"
+CREATE TABLE predicts.user_role
 (
   "id" SERIAL PRIMARY KEY,
   "name" VARCHAR,
   "description" VARCHAR,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-)
+);
 -- assign ownership to main db user
 ALTER TABLE predicts.user_role
     OWNER to "%1$s";
@@ -87,7 +90,7 @@ GRANT SELECT ON TABLE predicts.user_role TO "%3$s";
  * 3. CREATE user_assigned_role Table         *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.user_assigned_role"
+CREATE TABLE predicts.user_assigned_role
 (
   "id" SERIAL PRIMARY KEY,
   "user_header_id" INTEGER,
@@ -101,7 +104,7 @@ CREATE TABLE "predicts.user_assigned_role"
   -- user_role_id
   CONSTRAINT user_assigned_role_user_role_id FOREIGN KEY (user_role_id)
     REFERENCES predicts.user_role (id)
-)
+);
 ALTER TABLE predicts.user_assigned_role
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.user_assigned_role TO "%1$s";
@@ -113,7 +116,7 @@ GRANT SELECT ON TABLE predicts.user_assigned_role TO "%3$s";
  * 4. CREATE user_connection Table            *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.user_connection"
+CREATE TABLE predicts.user_connection
 (
   "id" SERIAL PRIMARY KEY,
   "user_id" INTEGER,
@@ -130,7 +133,7 @@ CREATE TABLE "predicts.user_connection"
   -- follower_id
   CONSTRAINT user_connection_follower_id FOREIGN KEY (follower_id)
     REFERENCES predicts.user_header (id)
-)
+);
 ALTER TABLE predicts.user_connection
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.user_connection TO "%1$s";
@@ -139,10 +142,31 @@ GRANT USAGE ON predicts.user_connection_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.user_connection TO "%3$s";
 
 /**********************************************
+ * 5. CREATE contest_type Table               *
+ *                                            *
+ **********************************************/
+CREATE TABLE predicts.contest_type
+(
+  "id" SERIAL PRIMARY KEY,
+  "name" VARCHAR,
+  "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+-- assign ownership to main db user
+ALTER TABLE predicts.contest_type
+    OWNER to "%1$s";
+GRANT ALL ON TABLE predicts.contest_type TO "%1$s";
+-- Give necessary instructions to write user
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_type TO "%2$s";
+GRANT USAGE ON predicts.contest_type_id_seq TO "%2$s";
+-- Give necessary instructions to read user
+GRANT SELECT ON TABLE predicts.contest_type TO "%3$s";
+
+/**********************************************
  * 5. CREATE contest_header Table             *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.contest_header"
+CREATE TABLE predicts.contest_header
 (
   "id" SERIAL PRIMARY KEY,
   "contest_name" VARCHAR,
@@ -150,6 +174,7 @@ CREATE TABLE "predicts.contest_header"
   "is_default" BOOLEAN,
   "created_by" INTEGER, -- FK CONSTRAINT
   "current_owner" INTEGER, -- FK CONSTRAINT
+  "contest_type_id" INTEGER, -- FK CONSTRAINT
   "is_public" BOOLEAN,
   "is_private" BOOLEAN,
   "invitation_code" VARCHAR,
@@ -168,11 +193,14 @@ CREATE TABLE "predicts.contest_header"
     REFERENCES predicts.user_header (id),
   -- current_owner
   CONSTRAINT contest_header_current_owner FOREIGN KEY (current_owner)
-    REFERENCES predicts.user_header (id),
+    REFERENCES predicts.user_header (id),  
+  -- contest_type_id
+  CONSTRAINT contest_header_contest_type_id FOREIGN KEY (contest_type_id)
+    REFERENCES predicts.contest_type (id),
   -- last_modified_by
   CONSTRAINT contest_header_last_modified_by FOREIGN KEY (last_modified_by)
     REFERENCES predicts.user_header (id)
-)
+);
 ALTER TABLE predicts.contest_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_header TO "%1$s";
@@ -184,7 +212,7 @@ GRANT SELECT ON TABLE predicts.contest_header TO "%3$s";
  * 6. CREATE scoring_system_header Table      *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.scoring_system_header"
+CREATE TABLE predicts.scoring_system_header
 (
   "id" SERIAL PRIMARY KEY,
   "contest_header_id" INTEGER, -- FK CONSTRAINT
@@ -203,7 +231,7 @@ CREATE TABLE "predicts.scoring_system_header"
   -- last_modified_by
   CONSTRAINT scoring_system_header_last_modified_by FOREIGN KEY (last_modified_by)
     REFERENCES predicts.contest_header (id)
-)
+);
 ALTER TABLE predicts.scoring_system_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.scoring_system_header TO "%1$s";
@@ -215,7 +243,7 @@ GRANT SELECT ON TABLE predicts.scoring_system_header TO "%3$s";
  * 7. CREATE scoring_system_detail Table      *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.scoring_system_detail"
+CREATE TABLE predicts.scoring_system_detail
 (
   "id" SERIAL PRIMARY KEY,
   "scoring_system_header_id" INTEGER, -- FK CONSTRAINT
@@ -240,8 +268,8 @@ CREATE TABLE "predicts.scoring_system_detail"
     REFERENCES predicts.user_header (id),
   -- last_modified_by
   CONSTRAINT scoring_system_detail_last_modified_by FOREIGN KEY (last_modified_by)
-    REFERENCES predicts.last_modified_by (id)
-)
+    REFERENCES predicts.user_header (id)
+);
 ALTER TABLE predicts.scoring_system_detail
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.scoring_system_detail TO "%1$s";
@@ -253,7 +281,7 @@ GRANT SELECT ON TABLE predicts.scoring_system_detail TO "%3$s";
  * 8. CREATE user_invite Table                *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.user_invite"
+CREATE TABLE predicts.user_invite
 (
   "id" SERIAL PRIMARY KEY,
   "invite_code" VARCHAR,
@@ -266,7 +294,7 @@ CREATE TABLE "predicts.user_invite"
   -- invite_creator
   CONSTRAINT user_invite_invite_creator FOREIGN KEY (invite_creator)
     REFERENCES predicts.user_header (id)
-)
+);
 ALTER TABLE predicts.user_invite
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.user_invite TO "%1$s";
@@ -278,7 +306,7 @@ GRANT SELECT ON TABLE predicts.user_invite TO "%3$s";
  * 9. CREATE successful_invite_user Table     *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.successful_invite_user"
+CREATE TABLE predicts.successful_invite_user
 (
   "id" SERIAL PRIMARY KEY,
   "user_invite_id" INTEGER, -- FK CONSTRAINT
@@ -292,7 +320,7 @@ CREATE TABLE "predicts.successful_invite_user"
   -- new_user_id
   CONSTRAINT successful_invite_user_new_user_id FOREIGN KEY (new_user_id)
     REFERENCES predicts.user_header (id)
-)
+);
 ALTER TABLE predicts.successful_invite_user
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.successful_invite_user TO "%1$s";
@@ -304,14 +332,14 @@ GRANT SELECT ON TABLE predicts.successful_invite_user TO "%3$s";
  * 10. CREATE participant_type Table          *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.participant_type"
+CREATE TABLE predicts.participant_type
 (
   "id" SERIAL PRIMARY KEY,
   "participant_type_name" VARCHAR,
   "participant_description" VARCHAR,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-)
+);
 ALTER TABLE predicts.participant_type
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.participant_type TO "%1$s";
@@ -323,14 +351,13 @@ GRANT SELECT ON TABLE predicts.participant_type TO "%3$s";
  * 11. CREATE contest_user Table              *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.contest_user"
+CREATE TABLE predicts.contest_user
 (
   "id" SERIAL PRIMARY KEY,
   "contest_header_id" INTEGER, -- FK CONSTRAINT
   "participant_type_id" INTEGER, -- FK CONSTRAINT
   "user_id" INTEGER, -- FK CONSTRAINT
   "is_invited" BOOLEAN,
-  "invite_status_id" SMALLINT, -- FK CONSTRAINT
   "is_active" BOOLEAN,
   "is_blocked" BOOLEAN,
   "balance" FLOAT,
@@ -348,16 +375,13 @@ CREATE TABLE "predicts.contest_user"
   -- user_id
   CONSTRAINT contest_user_user_id FOREIGN KEY (user_id)
     REFERENCES predicts.user_header (id),
-  -- invite_status_id
-  CONSTRAINT contest_user_invite_status_id FOREIGN KEY (invite_status_id)
-    REFERENCES predicts.invite_status (id),
   -- created_by
   CONSTRAINT contest_user_created_by FOREIGN KEY (created_by)
     REFERENCES predicts.user_header (id),
   -- invited_by
   CONSTRAINT contest_user_invited_by FOREIGN KEY (invited_by)
     REFERENCES predicts.user_header (id)
-)
+);
 ALTER TABLE predicts.contest_user
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_user TO "%1$s";
@@ -366,10 +390,70 @@ GRANT USAGE ON predicts.contest_user_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_user TO "%3$s";
 
 /**********************************************
+ * 12. CREATE contest_invite_type Table       *
+ *                                            *
+ **********************************************/
+CREATE TABLE predicts.contest_invite_type
+(
+  "id" SERIAL PRIMARY KEY,
+  "name" VARCHAR,
+  "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+-- assign ownership to main db user
+ALTER TABLE predicts.contest_invite_type
+    OWNER to "%1$s";
+GRANT ALL ON TABLE predicts.contest_invite_type TO "%1$s";
+-- Give necessary instructions to write user
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_invite_type TO "%2$s";
+GRANT USAGE ON predicts.contest_invite_type_id_seq TO "%2$s";
+-- Give necessary instructions to read user
+GRANT SELECT ON TABLE predicts.contest_invite_type TO "%3$s";
+
+/************************************************
+ * 13. CREATE contest_invite_application Table  *
+ *                                              *
+ ************************************************/
+CREATE TABLE predicts.contest_invite_application
+(
+  "id" SERIAL PRIMARY KEY,
+  "contest_header_id" INTEGER,
+  "contest_invite_type_id" INTEGER,
+  "user_id" INTEGER,
+  "is_confirmed" BOOLEAN,
+  "is_outstanding" BOOLEAN,
+  "responded_by" INTEGER,
+  "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  /* Constraints */
+  -- contest_header_id
+  CONSTRAINT contest_invite_application_contest_header_id FOREIGN KEY (contest_header_id)
+    REFERENCES predicts.contest_header (id),
+  -- contest_invite_type_id
+  CONSTRAINT contest_invite_application_contest_invite_type_id FOREIGN KEY (contest_invite_type_id)
+    REFERENCES predicts.contest_invite_type (id),
+  -- user_id
+  CONSTRAINT contest_invite_application_user_id FOREIGN KEY (user_id)
+    REFERENCES predicts.user_header (id),
+  -- responded_by
+  CONSTRAINT contest_invite_application_responded_by FOREIGN KEY (responded_by)
+    REFERENCES predicts.user_header (id)
+);
+-- assign ownership to main db user
+ALTER TABLE predicts.contest_invite_application
+    OWNER to "%1$s";
+GRANT ALL ON TABLE predicts.contest_invite_application TO "%1$s";
+-- Give necessary instructions to write user
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_invite_application TO "%2$s";
+GRANT USAGE ON predicts.contest_invite_application_id_seq TO "%2$s";
+-- Give necessary instructions to read user
+GRANT SELECT ON TABLE predicts.contest_invite_application TO "%3$s";
+
+/**********************************************
  * 12. CREATE team Table                      *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.team"
+CREATE TABLE predicts.team
 (
   "code" INTEGER,
   "fpl_team_id" INTEGER,
@@ -386,7 +470,7 @@ CREATE TABLE "predicts.team"
   "team_division" INTEGER,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-)
+);
 ALTER TABLE predicts.team
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.team TO "%1$s";
@@ -398,7 +482,7 @@ GRANT SELECT ON TABLE predicts.team TO "%3$s";
  * 13. CREATE season Table                    *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.season"
+CREATE TABLE predicts.season
 (
   "id" SERIAL PRIMARY KEY,
   "competition" VARCHAR,
@@ -408,10 +492,8 @@ CREATE TABLE "predicts.season"
   "is_previous" BOOLEAN,
   "is_next" BOOLEAN,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-)
+);
 ALTER TABLE predicts.season
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.season TO "%1$s";
@@ -423,7 +505,7 @@ GRANT SELECT ON TABLE predicts.season TO "%3$s";
  * 14. CREATE event Table                     *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.event"
+CREATE TABLE predicts.event
 (
   "id" SERIAL PRIMARY KEY,
   "fpl_event_id" INTEGER,
@@ -447,7 +529,7 @@ CREATE TABLE "predicts.event"
   -- season_id
   CONSTRAINT event_season_id FOREIGN KEY (season_id)
     REFERENCES predicts.season (id)
-)
+);
 ALTER TABLE predicts.event
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.event TO "%1$s";
@@ -459,7 +541,7 @@ GRANT SELECT ON TABLE predicts.event TO "%3$s";
  * 15. CREATE fixture_header Table            *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.fixture_header"
+CREATE TABLE predicts.fixture_header
 (
   "id" SERIAL PRIMARY KEY,
   "fpl_fixture_id" INTEGER,
@@ -498,8 +580,7 @@ CREATE TABLE "predicts.fixture_header"
   -- team_h
   CONSTRAINT fixture_header_team_h FOREIGN KEY (team_h)
     REFERENCES predicts.team (fpl_team_id)
-
-)
+);
 ALTER TABLE predicts.fixture_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.fixture_header TO "%1$s";
@@ -511,7 +592,7 @@ GRANT SELECT ON TABLE predicts.fixture_header TO "%3$s";
  * 16. CREATE default_slate_header Table      *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.default_slate_header"
+CREATE TABLE predicts.default_slate_header
 (
   "id" SERIAL PRIMARY KEY,
   "source" VARCHAR,
@@ -523,7 +604,7 @@ CREATE TABLE "predicts.default_slate_header"
   -- event_id
   CONSTRAINT default_slate_header_event_id FOREIGN KEY (event_id)
     REFERENCES predicts.event (id)
-)
+);
 ALTER TABLE predicts.default_slate_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.default_slate_header TO "%1$s";
@@ -535,7 +616,7 @@ GRANT SELECT ON TABLE predicts.default_slate_header TO "%3$s";
  * 17. CREATE default_slate_entries Table     *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.default_slate_entries"
+CREATE TABLE predicts.default_slate_entries
 (
   "id" SERIAL PRIMARY KEY,
   "default_slate_header_id" INTEGER, -- FK CONSTRAINT
@@ -549,7 +630,7 @@ CREATE TABLE "predicts.default_slate_entries"
   -- fixture_id
   CONSTRAINT default_slate_entries_fixture_id FOREIGN KEY (fixture_id)
     REFERENCES predicts.fixture_id (fixture_id)
-)
+);
 ALTER TABLE predicts.default_slate_entries
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.default_slate_entries TO "%1$s";
@@ -561,7 +642,7 @@ GRANT SELECT ON TABLE predicts.default_slate_entries TO "%3$s";
  * 18. CREATE contest_slate_header Table      *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.contest_slate_header"
+CREATE TABLE predicts.contest_slate_header
 (
   "id" SERIAL PRIMARY KEY,
   "contest_header_id" INTEGER, -- FK CONSTRAINT
@@ -583,7 +664,7 @@ CREATE TABLE "predicts.contest_slate_header"
   -- event_id
   CONSTRAINT contest_slate_header_event_id FOREIGN KEY (event_id)
     REFERENCES predicts.event (id)
-)
+);
 ALTER TABLE predicts.contest_slate_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_slate_header TO "%1$s";
@@ -595,7 +676,7 @@ GRANT SELECT ON TABLE predicts.contest_slate_header TO "%3$s";
  * 19. CREATE contest_slate_entry Table       *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.contest_slate_entry"
+CREATE TABLE predicts.contest_slate_entry
 (
   "id" SERIAL PRIMARY KEY,
   "contest_slate_header_id" INTEGER,
@@ -609,7 +690,7 @@ CREATE TABLE "predicts.contest_slate_entry"
   -- fixture_id
   CONSTRAINT contest_slate_entry_fixture_id FOREIGN KEY (fixture_id)
     REFERENCES predicts.fixture_header (id)
-)
+);
 ALTER TABLE predicts.contest_slate_entry
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_slate_entry TO "%1$s";
@@ -621,7 +702,7 @@ GRANT SELECT ON TABLE predicts.contest_slate_entry TO "%3$s";
  * 20. CREATE contest_slate_header_default_header Table  *
  *                                                       *
  *********************************************************/
-CREATE TABLE "predicts.contest_slate_header_default_header"
+CREATE TABLE predicts.contest_slate_header_default_header
 (
   "id" SERIAL PRIMARY KEY,
   "contest_slate_header_id" INTEGER,
@@ -635,7 +716,7 @@ CREATE TABLE "predicts.contest_slate_header_default_header"
   -- default_slate_header_id
   CONSTRAINT contest_slate_header_default_header_default_slate_header_id FOREIGN KEY (default_slate_header_id)
     REFERENCES predicts.default_slate_header (id)
-)
+);
 ALTER TABLE predicts.contest_slate_header_default_header
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_slate_header_default_header TO "%1$s";
@@ -647,7 +728,7 @@ GRANT SELECT ON TABLE predicts.contest_slate_header_default_header TO "%3$s";
  * 21. CREATE contest_result Table            *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.contest_result"
+CREATE TABLE predicts.contest_result
 (
   "id" SERIAL PRIMARY KEY,
   "contest_slate_entry_id" INTEGER, -- FK CONSTRAINT
@@ -672,7 +753,7 @@ CREATE TABLE "predicts.contest_result"
   -- contest_user_id
   CONSTRAINT contest_result_contest_user_id FOREIGN KEY (contest_user_id)
     REFERENCES predicts.contest_user (id)
-)
+);
 ALTER TABLE predicts.contest_result
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_result TO "%1$s";
@@ -684,7 +765,7 @@ GRANT SELECT ON TABLE predicts.contest_result TO "%3$s";
  * 22. CREATE contest_result_scoring Table    *
  *                                            *
  **********************************************/
-CREATE TABLE "predicts.contest_result_scoring"
+CREATE TABLE predicts.contest_result_scoring
 (
   "id" SERIAL PRIMARY KEY,
   "scoring_system_detail_id" INTEGER,
@@ -700,7 +781,7 @@ CREATE TABLE "predicts.contest_result_scoring"
   -- contest_result_id
   CONSTRAINT contest_result_contest_result_id FOREIGN KEY (contest_result_id)
     REFERENCES predicts.contest_result (id)
-)
+);
 ALTER TABLE predicts.contest_result_scoring
     OWNER to "%1$s";
 GRANT ALL ON TABLE predicts.contest_result_scoring TO "%1$s";

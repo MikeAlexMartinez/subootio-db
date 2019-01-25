@@ -1,16 +1,10 @@
 Table user_header {
-  id integer PK,
-  email varchar,
-  first_name varchar,
-  last_name varchar,
-  phone_number varchar,
-  favorite_team varchar,
-  country varchar,
-  display_name varchar,
-  is_private boolean,
-  is_premium boolean,
-  password varchar,
-  publickey varchar,
+  id integer PK
+  email varchar
+  password varchar
+  publickey varchar
+  is_private boolean
+  is_premium boolean
   date_created timestamp
   date_modified timestamp
 }
@@ -54,6 +48,13 @@ Ref user_connection_follower_id {
   user_connection.follower_id > user_header.id 
 }
 
+Table contest_type {
+  id integer PK
+  name varchar
+  date_created timestamp
+  date_modified timestamp
+}
+
 Table contest_header {
   id integer PK
   contest_name varchar
@@ -61,8 +62,7 @@ Table contest_header {
   is_default boolean
   created_by integer
   current_owner integer
-  is_public boolean
-  is_private boolean
+  contest_type_id integer
   invitation_code varchar
   start_date timestamp
   end_date timestamp
@@ -82,6 +82,9 @@ Ref contest_header_current_owner {
 }
 Ref contest_header_last_modified_by {
   contest_header.last_modified_by > user_header.id 
+}
+Ref contest_header_contest_type_id {
+  contest_header.contest_type_id > contest_type.id 
 }
 
 Table scoring_system_header {
@@ -145,7 +148,7 @@ Ref user_invite_invite_creator {
 
 Table successful_invite_user {
   id integer PK
-  userinvite_id integer
+  user_invite_id integer
   new_user_id integer
   date_created timestamp
   date_modified timestamp
@@ -154,7 +157,7 @@ Ref successful_invite_user_new_user_id {
   successful_invite_user.new_user_id - user_header.id
 }
 Ref successful_invite_user_userinvite_id {
-  successful_invite_user.userinvite_id - user_invite.id
+  successful_invite_user.user_invite_id - user_invite.id
 }
 
 Table participant_type {
@@ -171,7 +174,6 @@ Table contest_user {
   participant_type_id integer
   user_id integer
   is_invited boolean
-  invite_status_id smallint 
   is_active boolean
   is_blocked boolean
   balance float
@@ -243,6 +245,8 @@ Table event {
   is_next boolean
   is_previous boolean
   name varchar
+  date_created timestamp
+  date_modified timestamp
 }
 Ref event_season_id {
   event.season_id > season.id
@@ -256,7 +260,7 @@ Table fixture_header {
   code integer
   deadline_time timestamp
   deadline_time_formatted varchar
-  event_id integer
+  event integer
   event_day smallint
   finished boolean
   finished_provisional boolean
@@ -405,4 +409,35 @@ Ref contest_result_scoring_contest_result_id {
 }
 Ref contest_result_scoring_scoring_system_detail_id {
   contest_result_scoring.scoring_system_detail_id > scoring_system_detail.id
+}
+
+Table contest_invite_type {
+  id integer PK
+  name varchar
+  date_created timestamp
+  date_modified timestamp
+}
+
+Table contest_invite_application {
+  id integer PK
+  contest_header_id integer
+  contest_invite_type_id integer
+  user_id integer
+  is_confirmed boolean
+  is_outstanding boolean
+  responded_by integer
+  date_created timestamp
+  date_modified timestamp
+}
+Ref contest_invite_application_contest_header_id {
+  contest_invite_application.contest_header_id > contest_header.id
+}
+Ref contest_invite_application_contest_invite_type_id {
+  contest_invite_application.contest_invite_type_id > contest_invite_type.id
+}
+Ref contest_invite_application_user_id {
+  contest_invite_application.user_id > user_header.id
+}
+Ref contest_invite_application_responded_by {
+  contest_invite_application.responded_by > user_header.id
 }
