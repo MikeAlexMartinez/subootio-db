@@ -46,6 +46,7 @@ CREATE TABLE predicts.user_header
   "email" VARCHAR,
   "first_name" VARCHAR,
   "last_name" VARCHAR,
+  "country_code" VARCHAR,
   "phone_number" VARCHAR,
   "favorite_team" VARCHAR,
   "country" VARCHAR,
