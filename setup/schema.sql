@@ -241,6 +241,8 @@ CREATE TABLE predicts.default_scoring_system_header
 (
   "id" SERIAL PRIMARY KEY,
   "is_custom" INTEGER,
+  "name" VARCHAR,
+  "description" VARCHAR,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -323,8 +325,6 @@ CREATE TABLE predicts.scoring_system_detail
 (
   "id" SERIAL PRIMARY KEY,
   "scoring_system_header_id" INTEGER, -- FK CONSTRAINT
-  "name" VARCHAR,
-  "description" VARCHAR,
   "scoring_type_id" INTEGER, -- FK CONSTRAINT
   "is_active" BOOLEAN,
   "is_default" BOOLEAN,
