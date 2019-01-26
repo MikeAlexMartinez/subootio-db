@@ -61,5 +61,5 @@ typings/
 .next
 
 # block excel files
-.xlsx
-.xlsx#
+*.xlsx
+*.xlsx#
