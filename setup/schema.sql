@@ -261,8 +261,6 @@ CREATE TABLE predicts.default_scoring_system_detail
 (
   "id" SERIAL PRIMARY KEY,
   "default_scoring_system_header_id" INTEGER,  -- FK CONSTRAINT
-  "name" VARCHAR,
-  "description" VARCHAR,
   "scoring_type_id" INTEGER, -- FK CONSTRAINT
   "is_active" INTEGER,
   "is_default" INTEGER,
