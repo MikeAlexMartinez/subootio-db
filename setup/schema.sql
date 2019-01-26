@@ -341,7 +341,7 @@ CREATE TABLE predicts.scoring_system_detail
     REFERENCES predicts.scoring_system_header (id),
   -- scoring_type_id
   CONSTRAINT scoring_system_detail_scoring_type_id FOREIGN KEY (scoring_type_id)
-    REFERENCES predicts.scoring_type (id)
+    REFERENCES predicts.scoring_type (id),
   -- created_by
   CONSTRAINT scoring_system_detail_created_by FOREIGN KEY (created_by)
     REFERENCES predicts.user_header (id),
