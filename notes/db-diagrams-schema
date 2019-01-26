@@ -87,6 +87,40 @@ Ref contest_header_contest_type_id {
   contest_header.contest_type_id > contest_type.id 
 }
 
+Table scoring_type {
+  id serial pk
+  name varchar
+  description varchar
+  date_created timestamp
+  date_modified timestamp
+}
+Table default_scoring_system_header {
+  id serial pk
+  is_custom boolean
+  date_created timestamp
+  date_modified timestamp
+}
+Table default_scoring_system_detail {
+  id serial pk
+  default_scoring_system_header_id integer
+  name varchar
+  description varchar
+  scoring_type_id integer
+  is_active integer
+  is_default integer
+  start_date timestamp
+  end_date timestamp
+  points smallint
+  date_created timestamp
+  date_modified timestamp
+}
+Ref default_scoring_system_detail_default_scoring_system_header_id {
+    default_scoring_system_detail.default_scoring_system_header_id > default_scoring_system_header.id
+}
+Ref default_scoring_system_detail_scoring_type_id {
+  default_scoring_system_detail.scoring_type_id > scoring_type.id
+}
+
 Table scoring_system_header {
   id integer PK
   contest_header_id integer
@@ -111,7 +145,7 @@ Table scoring_system_detail {
   scoring_system_header_id integer
   name varchar
   description varchar
-  type varchar
+  scoring_type_id integer
   is_active boolean
   is_default boolean
   created_by integer
@@ -130,6 +164,9 @@ Ref scoring_system_detail_last_modified_by {
 }
 Ref scoring_system_detail_created_by {
   scoring_system_detail.created_by > user_header.id  
+}
+Ref scoring_system_detail_scoring_type_id {
+  scoring_system_detail.scoring_type_id > scoring_type.id  
 }
 
 

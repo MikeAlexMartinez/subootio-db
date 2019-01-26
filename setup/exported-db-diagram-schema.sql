@@ -63,6 +63,36 @@ CREATE TABLE "contest_header" (
   "date_modified" timestamp
 );
 
+CREATE TABLE "scoring_type" (
+  "id" serial,
+  "name" varchar,
+  "description" varchar,
+  "date_created" timestamp,
+  "date_modified" timestamp
+);
+
+CREATE TABLE "default_scoring_system_header" (
+  "id" serial,
+  "is_custom" boolean,
+  "date_created" timestamp,
+  "date_modified" timestamp
+);
+
+CREATE TABLE "default_scoring_system_detail" (
+  "id" serial,
+  "default_scoring_system_header_id" integer,
+  "name" varchar,
+  "description" varchar,
+  "scoring_type_id" integer,
+  "is_active" integer,
+  "is_default" integer,
+  "start_date" timestamp,
+  "end_date" timestamp,
+  "points" smallint,
+  "date_created" timestamp,
+  "date_modified" timestamp
+);
+
 CREATE TABLE "scoring_system_header" (
   "id" integer,
   "contest_header_id" integer,
@@ -78,7 +108,7 @@ CREATE TABLE "scoring_system_detail" (
   "scoring_system_header_id" integer,
   "name" varchar,
   "description" varchar,
-  "type" varchar,
+  "scoring_type_id" integer,
   "is_active" boolean,
   "is_default" boolean,
   "created_by" integer,
@@ -322,6 +352,10 @@ ALTER TABLE "contest_header" ADD FOREIGN KEY ("last_modified_by") REFERENCES "us
 
 ALTER TABLE "contest_header" ADD FOREIGN KEY ("contest_type_id") REFERENCES "contest_type" ("id");
 
+ALTER TABLE "default_scoring_system_detail" ADD FOREIGN KEY ("default_scoring_system_header_id") REFERENCES "default_scoring_system_header" ("id");
+
+ALTER TABLE "default_scoring_system_detail" ADD FOREIGN KEY ("scoring_type_id") REFERENCES "scoring_type" ("id");
+
 ALTER TABLE "scoring_system_header" ADD FOREIGN KEY ("created_by") REFERENCES "user_header" ("id");
 
 ALTER TABLE "scoring_system_header" ADD FOREIGN KEY ("last_modified_by") REFERENCES "user_header" ("id");
@@ -333,6 +367,8 @@ ALTER TABLE "scoring_system_detail" ADD FOREIGN KEY ("scoring_system_header_id")
 ALTER TABLE "scoring_system_detail" ADD FOREIGN KEY ("last_modified_by") REFERENCES "user_header" ("id");
 
 ALTER TABLE "scoring_system_detail" ADD FOREIGN KEY ("created_by") REFERENCES "user_header" ("id");
+
+ALTER TABLE "scoring_system_detail" ADD FOREIGN KEY ("scoring_type_id") REFERENCES "scoring_type" ("id");
 
 ALTER TABLE "user_invite" ADD FOREIGN KEY ("invite_creator") REFERENCES "user_header" ("id");
 
