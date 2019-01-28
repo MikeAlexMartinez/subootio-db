@@ -1,6 +1,43 @@
 'use strict';
 
-module.exports = PoolMock;
+const sinon = require('sinon');
+
+module.exports = {
+  PoolMock,
+  DbConnectionMock,
+  defineQueryReturnData
+};
+
+function defineQueryReturnData (data, calledWithFn) {
+  let count;
+  
+  return (str) => {
+    if (!(count)) {
+      count = 0;
+    } else {
+      count++;
+    }
+    const returnData = data[count];
+
+    if (calledWithFn) {
+      calledWithFn(str);
+    }
+
+    return new Promise((res) => {
+      res({
+        rows: returnData
+      });
+    });
+  };
+};
+
+function DbConnectionMock(fn) {
+  this.query = fn;
+  return {
+    query: this.query,
+    release: sinon.spy()
+  };
+}
 
 function PoolMock({
   user,

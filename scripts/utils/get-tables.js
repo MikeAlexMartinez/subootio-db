@@ -1,4 +1,4 @@
-const format = require('format');
+const format = require('pg-format');
 
 module.exports = getTableNames;
 
@@ -12,15 +12,15 @@ async function getTableNames({ activePool, schema }) {
 
   // Validate Input
   if (!activePool) {
-    return new Error('activePool is required');
+    throw new Error('An activePool is required');
   }
   if (!schema) {
-    return new Error('A schema must be provided in the function parameter object.')
+    throw new Error('A schema must be provided in the function parameter object.')
   }
 
   // Fetch Tables
   try {
-    await activePool.connect();
+    dbClient = await activePool.connect();
     const sql = format(`
       SELECT table_name
       FROM information_schema.tables
@@ -31,7 +31,9 @@ async function getTableNames({ activePool, schema }) {
   } catch (e) {
     throw e;
   } finally {
-    dbClient.release();
+    if (dbClient) {
+      dbClient.release();
+    }
   }
 
   return tables;
