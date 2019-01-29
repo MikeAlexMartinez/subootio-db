@@ -20,7 +20,7 @@ function defineQueryReturnData (data, calledWithFn) {
     const returnData = data[count];
 
     if (calledWithFn) {
-      calledWithFn(str);
+      calledWithFn(str, count);
     }
 
     return new Promise((res) => {

@@ -1,11 +1,8 @@
-// Node
-const fs = require('fs');
-const path = require('path');
-
 // Testing
 const expect = require('chai').expect;
 const rewire = require('rewire');
-const sinon = require('sinon');
+
+const dedent = require('dedent');
 
 const { DbConnectionMock, defineQueryReturnData } = require('../../__mocks__/pool-mock');
 
@@ -89,7 +86,7 @@ describe('utils: get-tables()', () => {
         await getTableNames({
           activePool,
           schema: 'predicts'
-        })
+        });
       } catch (e) {
         error = e;
       }
@@ -98,4 +95,59 @@ describe('utils: get-tables()', () => {
     });
   });
   
+  describe('DB Query', () => {
+    it('should query the database with the expected SQL statement', async () => {
+      let generatedSql;
+      const returnData = defineQueryReturnData([mockTables], (sql) => {
+        generatedSql = dedent(sql);
+      });
+      const dbConnection = new DbConnectionMock(returnData);
+      const activePool = {
+        connect: () => Promise.resolve(dbConnection)
+      };
+      let error;
+      try {
+        await getTableNames({
+          activePool,
+          schema: 'predicts'
+        });
+      } catch (e) {
+        error = e
+      }
+      const expectSql = dedent(`
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_type='BASE TABLE'
+        AND table_schema='predicts'
+      `)
+      expect(error).to.be.undefined;
+      expect(generatedSql).to.equal(expectSql);
+    });
+  });
+
+  describe('should return the tables', async () => {
+    const returnData = defineQueryReturnData([mockTables]);
+    const dbConnection = new DbConnectionMock(returnData);
+    const activePool = {
+      connect: () => Promise.resolve(dbConnection)
+    };
+    let error;
+    let tables;
+    try {
+      tables = await getTableNames({
+        activePool,
+        schema: 'predicts'
+      });
+    } catch (e) {
+      error = e
+    }
+    const expectSql = dedent(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_type='BASE TABLE'
+      AND table_schema='predicts'
+    `)
+    expect(error).to.be.undefined;
+    expect(tables).to.deep.equal(mockTables);
+  });
 });
