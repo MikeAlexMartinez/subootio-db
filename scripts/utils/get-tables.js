@@ -36,5 +36,5 @@ async function getTableNames({ activePool, schema }) {
     }
   }
 
-  return tables;
+  return tables.map(t => t.table_name);
 }

@@ -1,11 +1,9 @@
 // Core Node
 const fs = require('fs');
 const path = require('path');
-// Dependencies
-const { Pool } = require('pg');
-require('dotenv-safe').config();
 
 // My Modules
+const createPool = require('./utils/create-pool');
 const createUser = require('./utils/create-user');
 const rebuildDb = require('./utils/rebuild-db');
 
@@ -20,31 +18,20 @@ const rebuildDBSchemaSql = fs.readFileSync(rebuildDBSchemaFilePath).toString();
 
 const {
   DB_SUPER_USER,
-  DB_SUPER_PWD,
-  DB_HOST,
-  DB_NAME,
-  DB_PORT,
   PREDICTS_WRITE_USER,
   PREDICTS_WRITE_USER_PWD,
   PREDICTS_READ_USER,
-  PREDICTS_READ_USER_PWD,
+  PREDICTS_READ_USER_PWD
 } = process.env;
 
 (async function createDatabase() {
   let activePool;
   let errorEncountered = false;
 
-  // Create Pool
+  // create pool
   try {
-    activePool = new Pool({
-      user: DB_SUPER_USER,
-      password: DB_SUPER_PWD,
-      host: DB_HOST,
-      database: DB_NAME,
-      port: DB_PORT
-    });
+    activePool = await createPool();
   } catch (e) {
-    console.error('Error creating Pool');
     errorEncountered = true;
     throw e;
   }
