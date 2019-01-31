@@ -46,11 +46,25 @@ const getTableNames = require('./utils/get-tables');
 
   console.log(workbook.SheetNames);
   console.log(tableNames);
+
+  const sheetNames = workbook.SheetNames;
   // For each sheet in file
+  sheetNames.forEach((sheetname) => {
     // verify it exists in db
-    // If so add any missing fields
-    // insert into db.
-    // fin
+    if (!tableNames.includes(sheetname)) {
+      console.warn(`${sheetname} not present!`);
+    } else {
+      // If so add any missing fields
+      const worksheetObj = workbook.Sheets[sheetname];
+      const worksheetArr = XLSX.utils.sheet_to_json(worksheet)
+
+      // insert into db.
+
+    }
+  });
+
+  process.exit(0);
+
 })().catch(e => console.error(e));
 
 process.on('uncaughtException', (err) => {
