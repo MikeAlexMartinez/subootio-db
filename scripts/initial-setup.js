@@ -5,6 +5,7 @@ const XLSX = require('xlsx');
 const createPool = require('./utils/create-pool');
 const readExcelFile = require('./loaders/read-excel-file');
 const getTableNames = require('./utils/get-tables');
+const convertWorksheet = require('./utils/convert-worksheet');
 
 (async function initialSetup() {
   let activePool;
@@ -44,26 +45,39 @@ const getTableNames = require('./utils/get-tables');
     exit(4);
   }
 
-  console.log(workbook.SheetNames);
-  console.log(tableNames);
-
   const sheetNames = workbook.SheetNames;
   // For each sheet in file
-  sheetNames.forEach((sheetname) => {
+  const dataToInsert = sheetNames.map((sheetName) => {
     // verify it exists in db
-    if (!tableNames.includes(sheetname)) {
-      console.warn(`${sheetname} not present!`);
+    if (!tableNames.includes(sheetName)) {
+      console.warn(`${sheetName} not present!`);
     } else {
       // If so add any missing fields
-      const worksheetObj = workbook.Sheets[sheetname];
-      const worksheetArr = XLSX.utils.sheet_to_json(worksheet)
+      const worksheetObj = workbook.Sheets[sheetName];
+      const worksheetArr = XLSX.utils.sheet_to_json(worksheetObj);
 
       // insert into db.
+      try {
+        const worksheetData = convertWorksheet({
+          worksheetName: sheetName,
+          worksheetData: worksheetArr
+        });
 
+        return {
+          sheetName,
+          data: worksheetData
+        };
+      } catch (e) {
+        console.error(e);
+        exit(5);
+      }
     }
   });
 
+  console.log(dataToInsert);
+
   process.exit(0);
+  console.log('Initial Setup Complete');
 
 })().catch(e => console.error(e));
 

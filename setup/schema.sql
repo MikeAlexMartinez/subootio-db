@@ -153,6 +153,7 @@ CREATE TABLE predicts.contest_type
 (
   "id" SERIAL PRIMARY KEY,
   "name" VARCHAR,
+  "description" VARCHAR,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
