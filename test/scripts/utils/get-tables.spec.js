@@ -6,6 +6,12 @@ const dedent = require('dedent');
 
 const { DbConnectionMock, defineQueryReturnData } = require('../../__mocks__/pool-mock');
 
+const preMappedMockTables = [
+  {table_name: 'table_one'},
+  {table_name: 'table_two'},
+  {table_name: 'table_three'}
+];
+
 const mockTables = [
   'table_one',
   'table_two',
@@ -76,7 +82,7 @@ describe('utils: get-tables()', () => {
       expect(dbConnection.release.callCount).to.equal(1);
     });
     it('should be released even when an error doesn\'t occur', async () => {
-      const returnData = defineQueryReturnData([mockTables]);
+      const returnData = defineQueryReturnData([preMappedMockTables]);
       const dbConnection = new DbConnectionMock(returnData);
       const activePool = {
         connect: () => Promise.resolve(dbConnection)
@@ -98,7 +104,7 @@ describe('utils: get-tables()', () => {
   describe('DB Query', () => {
     it('should query the database with the expected SQL statement', async () => {
       let generatedSql;
-      const returnData = defineQueryReturnData([mockTables], (sql) => {
+      const returnData = defineQueryReturnData([preMappedMockTables], (sql) => {
         generatedSql = dedent(sql);
       });
       const dbConnection = new DbConnectionMock(returnData);
@@ -125,29 +131,26 @@ describe('utils: get-tables()', () => {
     });
   });
 
-  describe('should return the tables', async () => {
-    const returnData = defineQueryReturnData([mockTables]);
-    const dbConnection = new DbConnectionMock(returnData);
-    const activePool = {
-      connect: () => Promise.resolve(dbConnection)
-    };
-    let error;
-    let tables;
-    try {
-      tables = await getTableNames({
-        activePool,
-        schema: 'predicts'
-      });
-    } catch (e) {
-      error = e
-    }
-    const expectSql = dedent(`
-      SELECT table_name
-      FROM information_schema.tables
-      WHERE table_type='BASE TABLE'
-      AND table_schema='predicts'
-    `)
-    expect(error).to.be.undefined;
-    expect(tables).to.deep.equal(mockTables);
+  describe('should return the tables', () => {
+    it('if all is okay', async () => {
+      const returnData = defineQueryReturnData([preMappedMockTables]);
+      const dbConnection = new DbConnectionMock(returnData);
+      const activePool = {
+        connect: () => Promise.resolve(dbConnection)
+      };
+      let error;
+      let tables;
+      try {
+        tables = await getTableNames({
+          activePool,
+          schema: 'predicts'
+        });
+      } catch (e) {
+        console.error(e);
+        error = e
+      }
+      expect(error).to.be.undefined;
+      expect(tables).to.deep.equal(mockTables);
+    });
   });
 });

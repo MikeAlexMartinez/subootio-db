@@ -22,17 +22,20 @@ describe('db: row-constructors', () => {
     });
     it('should throw error if object is missing expected key', () => {
       let error;
+      const obj = {
+        test: 'test'
+      };
+      const model = ['test', 'missing'];
       try {
-        appendKeysWithDates({
-            test: 'test'
-          },
-          ['test', 'missing']
+        appendKeysWithDates(
+          obj,
+          model
         );
       } catch (e) {
         error = e;
       }
       expect(error).to.be.an('error');
-      expect(error.message).to.equal('missing is missing from passed object');
+      expect(error.message).to.equal(`missing is missing from passed\nrow: ${JSON.stringify(obj)}\nfor model: ${JSON.stringify(model)}`);
     });
   });
 });

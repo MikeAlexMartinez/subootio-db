@@ -6,6 +6,7 @@ const createPool = require('./utils/create-pool');
 const readExcelFile = require('./loaders/read-excel-file');
 const getTableNames = require('./utils/get-tables');
 const convertWorksheet = require('./utils/convert-worksheet');
+const initialModels = require('../db/models/initial');
 
 (async function initialSetup() {
   let activePool;
@@ -56,7 +57,6 @@ const convertWorksheet = require('./utils/convert-worksheet');
       const worksheetObj = workbook.Sheets[sheetName];
       const worksheetArr = XLSX.utils.sheet_to_json(worksheetObj);
 
-      // insert into db.
       try {
         const worksheetData = convertWorksheet({
           worksheetName: sheetName,

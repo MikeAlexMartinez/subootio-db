@@ -14,7 +14,7 @@ const sinon = require('sinon');
 // it should catch errors returned from readFile function
 // if all okay should return ExcelWorkbook
 
-describe('read-excel-file: ', () => {
+describe('Module: read-excel-file', () => {
   let readExcelFileModule;
   let readExcelFile;
 

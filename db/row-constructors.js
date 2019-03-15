@@ -30,7 +30,7 @@ function appendKeysWithDates(row, model) {
     if (row.hasOwnProperty(key)) {
       arr.push(row[key]);
     } else {
-      throw new Error(`${key} is missing from passed\nrow: ${JSON.stringify(row)}\nfor model: ${model}`);
+      throw new Error(`${key} is missing from passed\nrow: ${JSON.stringify(row)}\nfor model: ${JSON.stringify(model)}`);
     }
   }
 

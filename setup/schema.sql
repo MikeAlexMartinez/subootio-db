@@ -2,12 +2,12 @@
  * Build DB
  **/
 
-/* 28. */ DROP TABLE IF EXISTS predicts.contest_result_scoring;
+/* 28. */ DROP TABLE IF EXISTS predicts.contest_result_score;
 /* 27. */ DROP TABLE IF EXISTS predicts.contest_result;
 /* 26. */ DROP TABLE IF EXISTS predicts.contest_slate_header_default_header;
 /* 25. */ DROP TABLE IF EXISTS predicts.contest_slate_entry;
 /* 24. */ DROP TABLE IF EXISTS predicts.contest_slate_header;
-/* 23. */ DROP TABLE IF EXISTS predicts.default_slate_entries;
+/* 23. */ DROP TABLE IF EXISTS predicts.default_slate_entry;
 /* 22. */ DROP TABLE IF EXISTS predicts.default_slate_header;
 /* 21. */ DROP TABLE IF EXISTS predicts.fixture_header;
 /* 20. */ DROP TABLE IF EXISTS predicts.event;
@@ -691,10 +691,10 @@ GRANT USAGE ON predicts.default_slate_header_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.default_slate_header TO "%3$s";
 
 /**********************************************
- * 23. CREATE default_slate_entries Table     *
+ * 23. CREATE default_slate_entry Table     *
  *                                            *
  **********************************************/
-CREATE TABLE predicts.default_slate_entries
+CREATE TABLE predicts.default_slate_entry
 (
   "id" SERIAL PRIMARY KEY,
   "default_slate_header_id" INTEGER, -- FK CONSTRAINT
@@ -703,18 +703,18 @@ CREATE TABLE predicts.default_slate_entries
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
   -- default_slate_header_id
-  CONSTRAINT default_slate_entries_default_slate_header_id FOREIGN KEY (default_slate_header_id)
+  CONSTRAINT default_slate_entry_default_slate_header_id FOREIGN KEY (default_slate_header_id)
     REFERENCES predicts.default_slate_header (id),
   -- fixture_id
-  CONSTRAINT default_slate_entries_fixture_id FOREIGN KEY (fixture_id)
+  CONSTRAINT default_slate_entry_fixture_id FOREIGN KEY (fixture_id)
     REFERENCES predicts.fixture_header (id)
 );
-ALTER TABLE predicts.default_slate_entries
+ALTER TABLE predicts.default_slate_entry
     OWNER to "%1$s";
-GRANT ALL ON TABLE predicts.default_slate_entries TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.default_slate_entries TO "%2$s";
-GRANT USAGE ON predicts.default_slate_entries_id_seq TO "%2$s";
-GRANT SELECT ON TABLE predicts.default_slate_entries TO "%3$s";
+GRANT ALL ON TABLE predicts.default_slate_entry TO "%1$s";
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.default_slate_entry TO "%2$s";
+GRANT USAGE ON predicts.default_slate_entry_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.default_slate_entry TO "%3$s";
 
 /**********************************************
  * 24. CREATE contest_slate_header Table      *
@@ -840,10 +840,10 @@ GRANT USAGE ON predicts.contest_result_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.contest_result TO "%3$s";
 
 /**********************************************
- * 28. CREATE contest_result_scoring Table    *
+ * 28. CREATE contest_result_score Table      *
  *                                            *
  **********************************************/
-CREATE TABLE predicts.contest_result_scoring
+CREATE TABLE predicts.contest_result_score
 (
   "id" SERIAL PRIMARY KEY,
   "scoring_system_detail_id" INTEGER,
@@ -854,15 +854,15 @@ CREATE TABLE predicts.contest_result_scoring
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
   -- scoring_system_detail_id
-  CONSTRAINT contest_result_scoring_scoring_system_detail_id FOREIGN KEY (scoring_system_detail_id)
+  CONSTRAINT contest_result_score_scoring_system_detail_id FOREIGN KEY (scoring_system_detail_id)
     REFERENCES predicts.scoring_system_detail (id),
   -- contest_result_id
   CONSTRAINT contest_result_contest_result_id FOREIGN KEY (contest_result_id)
     REFERENCES predicts.contest_result (id)
 );
-ALTER TABLE predicts.contest_result_scoring
+ALTER TABLE predicts.contest_result_score
     OWNER to "%1$s";
-GRANT ALL ON TABLE predicts.contest_result_scoring TO "%1$s";
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_result_scoring TO "%2$s";
-GRANT USAGE ON predicts.contest_result_scoring_id_seq TO "%2$s";
-GRANT SELECT ON TABLE predicts.contest_result_scoring TO "%3$s";
+GRANT ALL ON TABLE predicts.contest_result_score TO "%1$s";
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_result_score TO "%2$s";
+GRANT USAGE ON predicts.contest_result_score_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.contest_result_score TO "%3$s";
