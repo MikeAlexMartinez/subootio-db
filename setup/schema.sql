@@ -24,12 +24,20 @@
 /* 9.  */ DROP TABLE IF EXISTS predicts.default_scoring_system_detail;
 /* 8.  */ DROP TABLE IF EXISTS predicts.default_scoring_system_header;
 /* 7.  */ DROP TABLE IF EXISTS predicts.scoring_type;
+
+
 /* 6.  */ DROP TABLE IF EXISTS predicts.contest_header;
+/* 6.  */ DROP TABLE IF EXISTS predicts.contest_modifier;
+/* 6.  */ DROP TABLE IF EXISTS predicts.contest_user_role;
+/* 6.  */ DROP TABLE IF EXISTS predicts.contest_owner;
+/* 6.  */ DROP TABLE IF EXISTS predicts.contest_creator;
+
 /* 5.  */ DROP TABLE IF EXISTS predicts.contest_type;
-/* 4.  */ DROP TABLE IF EXISTS predicts.user_connection;
+/* 4.  */ DROP TABLE IF EXISTS predicts.user_follower;
+/* 4.  */ DROP TABLE IF EXISTS predicts.follower;
 /* 3.  */ DROP TABLE IF EXISTS predicts.user_assigned_role;
 /* 2.  */ DROP TABLE IF EXISTS predicts.user_role;
-/* 1.  */ DROP TABLE IF EXISTS predicts.user_header;
+/* 1.  */ DROP TABLE IF EXISTS predicts.user;
 
 CREATE SCHEMA IF NOT EXISTS predicts AUTHORIZATION "%1$s";
 
@@ -37,10 +45,10 @@ GRANT USAGE ON SCHEMA predicts TO "%2$s";
 GRANT USAGE ON SCHEMA predicts TO "%3$s";
 
 /**********************************************
- * 1. CREATE user_header Table                 *
+ * 1. CREATE user Table                 *
  *                                            *
  **********************************************/
-CREATE TABLE predicts.user_header
+CREATE TABLE predicts.user
 (
   "id" SERIAL PRIMARY KEY,
   "email" VARCHAR,
@@ -55,18 +63,20 @@ CREATE TABLE predicts.user_header
   "is_premium" BOOLEAN,
   "password" VARCHAR,
   "publickey" VARCHAR,
+  "reset_token" VARCHAR,
+  "reset_token_expiry" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 -- assign ownership to main db user
-ALTER TABLE predicts.user_header
+ALTER TABLE predicts.user
     OWNER to "%1$s";
-GRANT ALL ON TABLE predicts.user_header TO "%1$s";
+GRANT ALL ON TABLE predicts.user TO "%1$s";
 -- Give necessary instructions to write user
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_header TO "%2$s";
-GRANT USAGE ON predicts.user_header_id_seq TO "%2$s";
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user TO "%2$s";
+GRANT USAGE ON predicts.user_id_seq TO "%2$s";
 -- Give necessary instructions to read user
-GRANT SELECT ON TABLE predicts.user_header TO "%3$s";
+GRANT SELECT ON TABLE predicts.user TO "%3$s";
 
 /**********************************************
  * 2. CREATE user_role Table                *
@@ -97,14 +107,14 @@ GRANT SELECT ON TABLE predicts.user_role TO "%3$s";
 CREATE TABLE predicts.user_assigned_role
 (
   "id" SERIAL PRIMARY KEY,
-  "user_header_id" INTEGER,
+  "user_id" INTEGER,
   "user_role_id" INTEGER,
   "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   /* Constraint */
-  -- user_header_id
-  CONSTRAINT user_assigned_role_user_header_id FOREIGN KEY (user_header_id)
-    REFERENCES predicts.user_header (id),
+  -- user_id
+  CONSTRAINT user_assigned_role_user_id FOREIGN KEY (user_id)
+    REFERENCES predicts.user (id),
   -- user_role_id
   CONSTRAINT user_assigned_role_user_role_id FOREIGN KEY (user_role_id)
     REFERENCES predicts.user_role (id)
@@ -117,14 +127,13 @@ GRANT USAGE ON predicts.user_assigned_role_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.user_assigned_role TO "%3$s";
 
 /**********************************************
- * 4. CREATE user_connection Table            *
+ * 5. CREATE follower Table                   *
  *                                            *
  **********************************************/
-CREATE TABLE predicts.user_connection
+CREATE TABLE predicts.follower
 (
   "id" SERIAL PRIMARY KEY,
   "user_id" INTEGER,
-  "follower_id" INTEGER,
   "awaiting_response" BOOLEAN,
   "is_active" BOOLEAN,
   "is_blocked" BOOLEAN,
@@ -133,10 +142,7 @@ CREATE TABLE predicts.user_connection
   /* Constraint */
   -- user_id
   CONSTRAINT user_connection_user_id FOREIGN KEY (user_id)
-    REFERENCES predicts.user_header (id),
-  -- follower_id
-  CONSTRAINT user_connection_follower_id FOREIGN KEY (follower_id)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user (id),
 );
 ALTER TABLE predicts.user_connection
     OWNER to "%1$s";
@@ -144,6 +150,32 @@ GRANT ALL ON TABLE predicts.user_connection TO "%1$s";
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_connection TO "%2$s";
 GRANT USAGE ON predicts.user_connection_id_seq TO "%2$s";
 GRANT SELECT ON TABLE predicts.user_connection TO "%3$s";
+
+/**********************************************
+ * 4. CREATE user_follower Table       *
+ *                                            *
+ **********************************************/
+CREATE TABLE predicts.user_follower
+(
+  "id" SERIAL PRIMARY KEY,
+  "user_id" INTEGER,
+  "follower_id" INTEGER,
+  "date_created" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  "date_modified" TIMESTAMP WITHOUT TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  /* Constraint */
+  -- user_id
+  CONSTRAINT user_follower_user_id FOREIGN KEY (user_id)
+    REFERENCES predicts.user (id),
+  -- follower_id
+  CONSTRAINT user_follower_follower_id FOREIGN KEY (follower_id)
+    REFERENCES predicts.follower (id)
+);
+ALTER TABLE predicts.user_follower
+    OWNER to "%1$s";
+GRANT ALL ON TABLE predicts.user_follower TO "%1$s";
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.user_follower TO "%2$s";
+GRANT USAGE ON predicts.user_follower_id_seq TO "%2$s";
+GRANT SELECT ON TABLE predicts.user_follower TO "%3$s";
 
 /**********************************************
  * 5. CREATE contest_type Table               *
@@ -166,6 +198,9 @@ GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE predicts.contest_type TO "%2$s";
 GRANT USAGE ON predicts.contest_type_id_seq TO "%2$s";
 -- Give necessary instructions to read user
 GRANT SELECT ON TABLE predicts.contest_type TO "%3$s";
+
+
+
 
 /**********************************************
  * 6. CREATE contest_header Table             *
@@ -195,16 +230,16 @@ CREATE TABLE predicts.contest_header
   /* Constraint */
   -- created_by
   CONSTRAINT contest_header_created_by FOREIGN KEY (created_by)
-    REFERENCES predicts.user_header (id),
+    REFERENCES predicts.user (id),
   -- current_owner
   CONSTRAINT contest_header_current_owner FOREIGN KEY (current_owner)
-    REFERENCES predicts.user_header (id),  
+    REFERENCES predicts.user (id),  
   -- contest_type_id
   CONSTRAINT contest_header_contest_type_id FOREIGN KEY (contest_type_id)
     REFERENCES predicts.contest_type (id),
   -- last_modified_by
   CONSTRAINT contest_header_last_modified_by FOREIGN KEY (last_modified_by)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user (id)
 );
 ALTER TABLE predicts.contest_header
     OWNER to "%1$s";
@@ -305,7 +340,7 @@ CREATE TABLE predicts.scoring_system_header
     REFERENCES predicts.contest_header (id),
   -- created_by
   CONSTRAINT scoring_system_header_created_by FOREIGN KEY (created_by)
-    REFERENCES predicts.user_header (id),
+    REFERENCES predicts.user (id),
   -- last_modified_by
   CONSTRAINT scoring_system_header_last_modified_by FOREIGN KEY (last_modified_by)
     REFERENCES predicts.contest_header (id)
@@ -344,10 +379,10 @@ CREATE TABLE predicts.scoring_system_detail
     REFERENCES predicts.scoring_type (id),
   -- created_by
   CONSTRAINT scoring_system_detail_created_by FOREIGN KEY (created_by)
-    REFERENCES predicts.user_header (id),
+    REFERENCES predicts.user (id),
   -- last_modified_by
   CONSTRAINT scoring_system_detail_last_modified_by FOREIGN KEY (last_modified_by)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user (id)
 );
 ALTER TABLE predicts.scoring_system_detail
     OWNER to "%1$s";
@@ -372,7 +407,7 @@ CREATE TABLE predicts.user_invite
   /* Constraint */
   -- invite_creator
   CONSTRAINT user_invite_invite_creator FOREIGN KEY (invite_creator)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user (id)
 );
 ALTER TABLE predicts.user_invite
     OWNER to "%1$s";
@@ -385,7 +420,7 @@ GRANT SELECT ON TABLE predicts.user_invite TO "%3$s";
  * 13. CREATE successful_invite_user Table    *
  *                                            *
  **********************************************/
-CREATE TABLE predicts.successful_invite_user
+CREATE TABLE predicts.successful_invite
 (
   "id" SERIAL PRIMARY KEY,
   "user_invite_id" INTEGER, -- FK CONSTRAINT
@@ -398,7 +433,7 @@ CREATE TABLE predicts.successful_invite_user
     REFERENCES predicts.user_invite (id),
   -- new_user_id
   CONSTRAINT successful_invite_user_new_user_id FOREIGN KEY (new_user_id)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user (id)
 );
 ALTER TABLE predicts.successful_invite_user
     OWNER to "%1$s";
@@ -453,13 +488,13 @@ CREATE TABLE predicts.contest_user
     REFERENCES predicts.participant_type (id),
   -- user_id
   CONSTRAINT contest_user_user_id FOREIGN KEY (user_id)
-    REFERENCES predicts.user_header (id),
+    REFERENCES predicts.user (id),
   -- created_by
   CONSTRAINT contest_user_created_by FOREIGN KEY (created_by)
-    REFERENCES predicts.user_header (id),
+    REFERENCES predicts.user (id),
   -- invited_by
   CONSTRAINT contest_user_invited_by FOREIGN KEY (invited_by)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user (id)
 );
 ALTER TABLE predicts.contest_user
     OWNER to "%1$s";
@@ -513,10 +548,10 @@ CREATE TABLE predicts.contest_invite_application
     REFERENCES predicts.contest_invite_type (id),
   -- user_id
   CONSTRAINT contest_invite_application_user_id FOREIGN KEY (user_id)
-    REFERENCES predicts.user_header (id),
+    REFERENCES predicts.user (id),
   -- responded_by
   CONSTRAINT contest_invite_application_responded_by FOREIGN KEY (responded_by)
-    REFERENCES predicts.user_header (id)
+    REFERENCES predicts.user (id)
 );
 -- assign ownership to main db user
 ALTER TABLE predicts.contest_invite_application
